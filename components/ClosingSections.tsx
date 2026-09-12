@@ -1,74 +1,54 @@
-"use client";
-
-import { MOTION_EASE_CSS } from "@/lib/motion-tokens";
-import { useMotionGate } from "@/lib/motion-gate";
-import { useOnceVisible } from "@/lib/use-once-visible";
 import { CONTACT_LINKS } from "@/lib/site";
-import { Section } from "./Section";
 
-const SKELETON_COUNT = 3;
-/** Stagger budget: last slot settled by 350ms (250ms + 2 × 50ms). */
-const SETTLE_MS = 250;
-const STAGGER_MS = 50;
+const SPEC_SLOTS = ["S.01", "S.02", "S.03"];
 
 /**
- * 04 Projects: the Coming-soon shelf. Empty-state TUI output plus exactly
- * three skeleton slots — empty bordered cards, subtle pulse, zero fake
- * titles, descriptions, or links. The staggered settle on scroll entry is
- * this Section's Apple-style moment (one of max two).
+ * 04 Projects: the Coming-soon shelf as a ledger table. Exactly three spec
+ * slots — Slot/Status/Spec rows, zero fake titles, descriptions, or links.
  */
 export function ProjectsShelf() {
-  const { motionOK } = useMotionGate();
-  const { ref: listRef, visible: settled } =
-    useOnceVisible<HTMLUListElement>(0.3);
-
   return (
-    <Section
+    <section
       id="projects"
-      index="04"
-      label="projects"
-      labelledBy="projects-heading"
+      aria-labelledby="projects-heading"
+      className="border-b border-(--color-hairline) px-6 py-12 md:px-12"
     >
-      <div className="max-w-3xl">
-        <h2
-          id="projects-heading"
-          className="font-display text-3xl font-semibold tracking-tight text-(--color-lume) md:text-4xl"
-        >
-          Projects
-        </h2>
-        <div className="mt-6 border border-(--color-hairline) bg-(--color-panel) px-3 py-2.5 font-mono text-sm">
-          <span aria-hidden className="text-(--color-brass)">
-            $&nbsp;
-          </span>
-          <span className="text-(--color-lume)">ls projects</span>
-        </div>
-        <p role="status" className="mt-2 font-mono text-xs text-(--color-faint)">
-          0 results — building in public, check back soon
-        </p>
-        <ul
-          ref={listRef}
-          aria-label="coming-soon shelf"
-          className="mt-6 grid gap-3 sm:grid-cols-3"
-        >
-          {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
-            <li
-              key={i}
-              aria-hidden
-              className="shelf-pulse min-h-36 border border-(--color-hairline) bg-(--color-panel)/60"
-              style={
-                motionOK
-                  ? {
-                      opacity: settled ? undefined : 0,
-                      transform: settled ? "none" : "translateY(12px)",
-                      transition: `opacity ${SETTLE_MS}ms ${MOTION_EASE_CSS} ${i * STAGGER_MS}ms, transform ${SETTLE_MS}ms ${MOTION_EASE_CSS} ${i * STAGGER_MS}ms`,
-                    }
-                  : undefined
-              }
-            />
+      <h2
+        id="projects-heading"
+        className="font-display text-2xl font-semibold tracking-tight"
+      >
+        Projects
+      </h2>
+      <p className="mt-3 text-sm text-(--color-faint)">
+        Nothing here yet — building in public, check back soon.
+      </p>
+      <table className="mt-6 w-full font-mono text-sm">
+        <thead>
+          <tr className="text-left text-[11px] text-(--color-faint)">
+            <th scope="col" className="py-2 pr-4 font-normal">
+              Slot
+            </th>
+            <th scope="col" className="py-2 pr-4 font-normal">
+              Status
+            </th>
+            <th scope="col" className="py-2 text-right font-normal">
+              Spec
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {SPEC_SLOTS.map((slot) => (
+            <tr key={slot} className="border-t border-(--color-hairline)">
+              <td className="py-3 pr-4">{slot}</td>
+              <td className="py-3 pr-4">Empty</td>
+              <td className="py-3 text-right text-(--color-faint)">
+                Forthcoming
+              </td>
+            </tr>
           ))}
-        </ul>
-      </div>
-    </Section>
+        </tbody>
+      </table>
+    </section>
   );
 }
 
@@ -78,39 +58,38 @@ export function ProjectsShelf() {
  */
 export function ContactFooter() {
   return (
-    <Section id="contact" index="05" label="contact" labelledBy="contact-heading">
-      <div className="max-w-2xl">
-        <h2
-          id="contact-heading"
-          className="font-display text-3xl font-semibold tracking-tight text-(--color-lume) md:text-4xl"
-        >
-          Contact
-        </h2>
-        <ul className="mt-8 divide-y divide-(--color-hairline) border-y border-(--color-hairline)">
-          {CONTACT_LINKS.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                data-placeholder={link.placeholder ? "true" : undefined}
-                className="group flex items-center justify-between py-3 font-mono text-sm text-(--color-lume) hover:text-(--color-brass)"
-              >
-                <span>{link.label}</span>
-                <span aria-hidden className="text-(--color-faint)">
-                  ↗
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3 font-mono text-[11px] text-(--color-faint)">
-          {"// hrefs provisional — final URLs pending"}
-        </p>
-      </div>
-      <footer className="mt-20 border-t border-(--color-hairline) pt-6 pb-16">
-        <p className="font-mono text-xs text-(--color-faint)">
+    <section
+      id="contact"
+      aria-labelledby="contact-heading"
+      className="px-6 py-12 md:px-12"
+    >
+      <h2
+        id="contact-heading"
+        className="font-display text-2xl font-semibold tracking-tight"
+      >
+        Contact
+      </h2>
+      <ul className="mt-6 grid grid-cols-2 gap-px border border-(--color-hairline) bg-(--color-hairline) md:grid-cols-4">
+        {CONTACT_LINKS.map((link) => (
+          <li key={link.label} className="bg-(--color-panel)">
+            <a
+              href={link.href}
+              data-placeholder={link.placeholder ? "true" : undefined}
+              className="block p-6 text-center font-mono text-sm text-(--color-lume) hover:text-(--color-brass)"
+            >
+              {link.label} <span aria-hidden>↗</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 font-mono text-[11px] text-(--color-faint)">
+        {"// hrefs provisional — final URLs pending"}
+      </p>
+      <footer className="mt-10 border-t border-(--color-hairline) pt-6">
+        <p className="text-center font-mono text-xs text-(--color-faint)">
           The cold keeps its own ledger.
         </p>
       </footer>
-    </Section>
+    </section>
   );
 }

@@ -19,20 +19,21 @@ export const VERSION = "v1.8";
 
 export interface PeriodicTile {
   symbol: string;
-  index: string;
+  /** Latest version of the stack item — verified 2026-09-12, re-check on touch. */
+  version: string;
   name: string;
 }
 
-/** Stack renders exclusively as Periodic tiles (symbol + index). */
+/** Stack renders exclusively as Periodic tiles (symbol + version). */
 export const PERIODIC_TILES: PeriodicTile[] = [
-  { symbol: "Ts", index: "01", name: "TypeScript" },
-  { symbol: "Re", index: "02", name: "React" },
-  { symbol: "Nx", index: "03", name: "Next.js" },
-  { symbol: "No", index: "04", name: "Node" },
-  { symbol: "Ta", index: "05", name: "Tailwind" },
-  { symbol: "Mo", index: "06", name: "Motion" },
-  { symbol: "Pg", index: "07", name: "Postgres" },
-  { symbol: "Bu", index: "08", name: "Bun" },
+  { symbol: "Ts", version: "5.9", name: "TypeScript" },
+  { symbol: "Re", version: "19", name: "React" },
+  { symbol: "Nx", version: "16", name: "Next.js" },
+  { symbol: "No", version: "26", name: "Node" },
+  { symbol: "Ta", version: "4", name: "Tailwind" },
+  { symbol: "Mo", version: "13", name: "Motion" },
+  { symbol: "Pg", version: "18", name: "Postgres" },
+  { symbol: "Bu", version: "1.4", name: "Bun" },
 ];
 
 export interface ContactLink {
