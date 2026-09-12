@@ -33,7 +33,7 @@ The alternate theme reached by typing `sic mundus` in the hero prompt; the site'
 _Avoid_: dark mode, alternate theme
 
 **Periodic tile**:
-A skill rendered as a Breaking Bad-style periodic-table element (symbol + index), the only Breaking Bad visual allowed.
+A skill rendered as a Breaking Bad-style periodic-table element (symbol + latest version), the only Breaking Bad visual allowed.
 _Avoid_: skill badge, pill, chip
 
 **Sweeping seconds**:

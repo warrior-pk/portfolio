@@ -14,7 +14,8 @@ function flipToDarkWorld() {
  * Hero prompt: the single working terminal moment. Accepts exactly three
  * commands (scroll to their Section); `help` lists them; unknown input
  * gets a dry error. The Easter egg phrase flips the Dark-world theme with
- * nothing hinted in the UI.
+ * nothing hinted in the UI. Visually it is a bare input line — no sigil,
+ * no box — so the terminal is inferred, never stated.
  */
 export function HeroPrompt() {
   const [value, setValue] = useState("");
@@ -55,11 +56,8 @@ export function HeroPrompt() {
           run(value);
           setValue("");
         }}
-        className="flex items-center gap-2 border border-(--color-hairline) bg-(--color-panel) px-3 py-2.5 focus-within:border-(--color-brass)"
+        className="mt-10 max-w-xl border-b border-(--color-hairline) focus-within:border-(--color-brass)"
       >
-        <span aria-hidden className="font-mono text-sm text-(--color-brass)">
-          $
-        </span>
         <label htmlFor="hero-prompt" className="sr-only">
           type a command: projects, about, contact, or help
         </label>
@@ -72,7 +70,7 @@ export function HeroPrompt() {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="type help + enter"
-          className="w-full bg-transparent font-mono text-sm text-(--color-lume) placeholder:text-(--color-faint)/60 focus:outline-none"
+          className="w-full bg-transparent py-2.5 font-mono text-sm text-(--color-lume) placeholder:text-(--color-faint)/60 focus:outline-none"
         />
       </form>
       <div aria-live="polite" className="mt-2 min-h-5 font-mono text-xs text-(--color-faint)">
