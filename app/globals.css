@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: var(--font-grotesk), "Space Grotesk", "Archivo", system-ui,
+    -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-jbmono), "JetBrains Mono", "IBM Plex Mono",
+    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --color-void: #0a0a0b;
+  --color-panel: #101013;
+  --color-lume: #edebe2;
+  --color-faint: #a3a097;
+  --color-hairline: #26262b;
+  --color-brass: #d9a441;
+  --color-tile: #2f7d3b;
+
+  --color-abyss: #060a12;
+  --color-abyss-panel: #0b1220;
+  --color-glacier: #cfe0ff;
+  --color-glacier-faint: #8fa3c7;
+  --color-worldline: #22314f;
+  --color-cold: #7aa2ff;
+
+  --ease-out-single: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+html[data-world="dark-world"] {
+  --color-void: var(--color-abyss);
+  --color-panel: var(--color-abyss-panel);
+  --color-lume: var(--color-glacier);
+  --color-faint: var(--color-glacier-faint);
+  --color-hairline: var(--color-worldline);
+  --color-brass: var(--color-cold);
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-lume);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-brass);
+  color: #0a0a0b;
+}
+
+/* Visible focus everywhere: keyboard contract */
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Mechanical tick for the status-bar timestamp: discrete steps, no sweep */
+@keyframes tick-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+.tick-colon {
+  animation: tick-blink 1s steps(1, end) infinite;
+}
+
+/* Skeleton pulse: low-amplitude, restrained */
+@keyframes shelf-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.shelf-pulse {
+  animation: shelf-pulse 1.6s var(--ease-out-single) infinite;
+}
+
+/* Single motion gate: one place kills ALL motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
