@@ -40,9 +40,19 @@ function readGate(): MotionGate {
  * Single motion gate for the whole route. Disables smooth scroll, reveals,
  * cursor effects and pins under reduced-motion; cursor FX additionally need
  * a fine desktop pointer. Mirrors the gate to `data-motion` for CSS.
+ *
+ * Hydration contract: the initial state is the server-safe default on BOTH
+ * server and first client render (never read matchMedia during render), so
+ * gated branches render identically; the real gate applies in an effect
+ * after mount.
  */
 export function useMotionGate(): MotionGate {
-  const [gate, setGate] = useState<MotionGate>(readGate);
+  const [gate, setGate] = useState<MotionGate>(() => ({
+    reducedMotion: false,
+    coarsePointer: false,
+    motionOK: true,
+    pointerFX: false,
+  }));
 
   useEffect(() => {
     const update = () => setGate(readGate());

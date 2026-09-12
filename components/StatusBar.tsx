@@ -5,8 +5,12 @@ import { SECTIONS, VERSION } from "@/lib/site";
 import { SweepingSecondsHand } from "./SweepingSecondsHand";
 
 function useNow() {
-  const [now, setNow] = useState(() => new Date());
+  // Null on server + first client render so SSR HTML matches; the clock
+  // starts after mount. Rendering `new Date()` during render would hydrate
+  // against a stale server timestamp.
+  const [now, setNow] = useState<Date | null>(null);
   useEffect(() => {
+    setNow(new Date());
     const t = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(t);
   }, []);
@@ -43,9 +47,9 @@ export function StatusBar() {
   const active = useActiveSection();
   const position = SECTIONS.findIndex((s) => s.id === active) + 1 || 1;
 
-  const hh = String(now.getHours()).padStart(2, "0");
-  const mm = String(now.getMinutes()).padStart(2, "0");
-  const ss = String(now.getSeconds()).padStart(2, "0");
+  const hh = now ? String(now.getHours()).padStart(2, "0") : "--";
+  const mm = now ? String(now.getMinutes()).padStart(2, "0") : "--";
+  const ss = now ? String(now.getSeconds()).padStart(2, "0") : "--";
 
   return (
     <div
