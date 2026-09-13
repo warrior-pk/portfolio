@@ -14,26 +14,25 @@ export const SECTIONS: SiteSection[] = [
   { index: "05", id: "contact", label: "contact" },
 ];
 
-/** Hidden 18: version string carries the covert tally. */
-export const VERSION = "v1.8";
+/** Site version shown in the status bar. */
+export const VERSION = "v0.1";
 
 export interface PeriodicTile {
   symbol: string;
-  /** Latest version of the stack item — verified 2026-09-12, re-check on touch. */
+  /** Latest version of the stack item — verified 2026-09-13, re-check on touch. */
   version: string;
   name: string;
 }
 
 /** Stack renders exclusively as Periodic tiles (symbol + version). */
 export const PERIODIC_TILES: PeriodicTile[] = [
-  { symbol: "Ts", version: "5.9", name: "TypeScript" },
-  { symbol: "Re", version: "19", name: "React" },
-  { symbol: "Nx", version: "16", name: "Next.js" },
+  { symbol: "Ts", version: "7", name: "TypeScript" },
+  { symbol: "Ja", version: "25", name: "Java" },
+  { symbol: "Py", version: "3.14", name: "Python" },
   { symbol: "No", version: "26", name: "Node" },
-  { symbol: "Ta", version: "4", name: "Tailwind" },
-  { symbol: "Mo", version: "13", name: "Motion" },
-  { symbol: "Pg", version: "18", name: "Postgres" },
-  { symbol: "Bu", version: "1.4", name: "Bun" },
+  { symbol: "Nx", version: "16.3", name: "Next.js" },
+  { symbol: "Re", version: "19.3", name: "React" },
+  { symbol: "Sb", version: "4.1", name: "Spring Boot" },
 ];
 
 export interface ContactLink {
@@ -44,9 +43,12 @@ export interface ContactLink {
 }
 
 export const CONTACT_LINKS: ContactLink[] = [
-  // hrefs provisional — final URLs pending
-  { label: "email", href: "mailto:hello@example.com", placeholder: true },
-  { label: "github", href: "https://github.com/", placeholder: true },
-  { label: "linkedin", href: "https://www.linkedin.com/", placeholder: true },
-  { label: "x", href: "https://x.com/", placeholder: true },
+  { label: "email", href: "mailto:piyu8h@outlook.com", placeholder: false },
+  { label: "github", href: "https://github.com/warrior-pk", placeholder: false },
+  {
+    label: "linkedin",
+    href: "https://www.linkedin.com/in/piyu8h",
+    placeholder: false,
+  },
+  { label: "x", href: "https://x.com/_piyu8h", placeholder: false },
 ];

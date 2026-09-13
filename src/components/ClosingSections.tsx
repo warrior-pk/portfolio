@@ -1,10 +1,8 @@
 import { CONTACT_LINKS } from "@/lib/site";
 
-const SPEC_SLOTS = ["S.01", "S.02", "S.03"];
-
 /**
- * 04 Projects: the Coming-soon shelf as a ledger table. Exactly three spec
- * slots — Slot/Status/Spec rows, zero fake titles, descriptions, or links.
+ * 04 Projects: one honest teaser line until the interactive showcase
+ * unlocks. No fake titles, no placeholder slots.
  */
 export function ProjectsShelf() {
   return (
@@ -19,35 +17,10 @@ export function ProjectsShelf() {
       >
         Projects
       </h2>
-      <p className="mt-3 text-sm text-(--color-faint)">
-        Nothing here yet — building in public, check back soon.
+      <p className="mt-3 max-w-md leading-relaxed text-(--color-faint)">
+        My work — web apps and backend services — gets an interactive
+        showcase here. This section unlocks soon.
       </p>
-      <table className="mt-6 w-full font-mono text-sm">
-        <thead>
-          <tr className="text-left text-[11px] text-(--color-faint)">
-            <th scope="col" className="py-2 pr-4 font-normal">
-              Slot
-            </th>
-            <th scope="col" className="py-2 pr-4 font-normal">
-              Status
-            </th>
-            <th scope="col" className="py-2 text-right font-normal">
-              Spec
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {SPEC_SLOTS.map((slot) => (
-            <tr key={slot} className="border-t border-(--color-hairline)">
-              <td className="py-3 pr-4">{slot}</td>
-              <td className="py-3 pr-4">Empty</td>
-              <td className="py-3 text-right text-(--color-faint)">
-                Forthcoming
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </section>
   );
 }
@@ -82,14 +55,6 @@ export function ContactFooter() {
           </li>
         ))}
       </ul>
-      <p className="mt-3 font-mono text-[11px] text-(--color-faint)">
-        {"// hrefs provisional — final URLs pending"}
-      </p>
-      <footer className="mt-10 border-t border-(--color-hairline) pt-6">
-        <p className="text-center font-mono text-xs text-(--color-faint)">
-          The cold keeps its own ledger.
-        </p>
-      </footer>
     </section>
   );
 }

@@ -18,10 +18,10 @@ export function AboutSection() {
         Fast, quiet interfaces and the systems behind them.
       </p>
       <p className="mt-4 leading-relaxed text-(--color-faint)">
-        I&apos;m a software developer working mostly in TypeScript across the
-        stack — from static pages like this one to services that stay up when
-        it matters. I like work the way great chases are finished: calm under
-        a climbing asking rate, committed to seeing it through.
+        I&apos;m Piyush Kumar, a software developer exploring tech across
+        TypeScript, JavaScript, Java, C++, and Python. Right now I&apos;m
+        learning in public — fast, quiet interfaces up front, solid
+        fundamentals behind them.
       </p>
     </section>
   );

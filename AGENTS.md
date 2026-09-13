@@ -1,5 +1,11 @@
 ## Agent skills
 
+### Package manager
+
+Bun only. Use `bun`, `bunx`, and `bun run` for every command —
+never `npm`/`npx`, `pnpm`, or `yarn`. The only lockfile is `bun.lock`;
+do not create `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock`.
+
 ### Issue tracker
 
 Issues live in GitHub Issues (`warrior-pk/portfolio`) via the `gh` CLI. See `docs/agents/issue-tracker.md`.

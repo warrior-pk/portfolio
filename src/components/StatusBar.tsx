@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SECTIONS, VERSION } from "@/lib/site";
+import { VERSION } from "@/lib/site";
 import { SweepingSecondsHand } from "./SweepingSecondsHand";
 
 function useNow() {
@@ -17,35 +17,13 @@ function useNow() {
   return now;
 }
 
-function useActiveSection() {
-  const [active, setActive] = useState("hero");
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        }
-      },
-      { rootMargin: "-45% 0px -45% 0px" },
-    );
-    for (const s of SECTIONS) {
-      const el = document.getElementById(s.id);
-      if (el) observer.observe(el);
-    }
-    return () => observer.disconnect();
-  }, []);
-  return active;
-}
-
 /**
- * TUI chrome: slim persistent status bar owning the Section indicator,
- * the version string carrying the Hidden 18, the ticking timestamp with
- * mechanical-tick easing, and the Sweeping seconds hand.
+ * TUI chrome: slim persistent status bar owning the version string,
+ * the ticking timestamp with mechanical-tick easing, and the Sweeping
+ * seconds hand.
  */
 export function StatusBar() {
   const now = useNow();
-  const active = useActiveSection();
-  const position = SECTIONS.findIndex((s) => s.id === active) + 1 || 1;
 
   const hh = now ? String(now.getHours()).padStart(2, "0") : "--";
   const mm = now ? String(now.getMinutes()).padStart(2, "0") : "--";
@@ -54,16 +32,10 @@ export function StatusBar() {
   return (
     <div
       role="status"
-      aria-label={`section ${position} of 5, version ${VERSION}`}
+      aria-label={`version ${VERSION}`}
       className="fixed inset-x-0 bottom-0 z-[60] border-t border-(--color-hairline) bg-(--color-void)/90 backdrop-blur-sm"
     >
       <div className="mx-auto flex h-9 max-w-6xl items-center gap-3 px-4 font-mono text-[11px] tracking-wide text-(--color-faint)">
-        <span className="tabular-nums text-(--color-lume)">
-          {String(position).padStart(2, "0")}/05
-        </span>
-        <span aria-hidden className="text-(--color-hairline)">
-          |
-        </span>
         <span>{VERSION}</span>
         <span aria-hidden className="text-(--color-hairline)">
           |

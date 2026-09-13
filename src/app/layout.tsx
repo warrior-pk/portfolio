@@ -7,7 +7,7 @@ import { CursorSpotlight } from "@/components/CursorSpotlight";
 import { StatusBar } from "@/components/StatusBar";
 
 export const metadata: Metadata = {
-  title: "warrior-pk — software developer",
+  title: "Piyush Kumar — software developer",
   description:
     "Single-route portfolio: quiet interfaces, fast pages. Five sections, one prompt.",
   icons: { icon: "/favicon.svg" },
