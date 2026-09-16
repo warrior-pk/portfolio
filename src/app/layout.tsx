@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { JetBrains_Mono, Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/LenisProvider";
 import { CursorSpotlight } from "@/components/CursorSpotlight";
@@ -7,6 +7,9 @@ import { SectionDots } from "@/components/SectionDots";
 import { StatusBar } from "@/components/StatusBar";
 import { TriquetraMark } from "@/components/TriquetraMark";
 import { PreloaderDismiss } from "@/components/PreloaderDismiss";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 export const metadata: Metadata = {
   title: "Piyush Kumar — software developer",
@@ -36,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${grotesk.variable} ${mono.variable}`}>
+    <html lang="en" className={cn(grotesk.variable, mono.variable, "font-sans", geist.variable)}>
       <body className="font-display bg-(--color-void) text-(--color-lume)">
         {/* HTML-first veil: server-rendered, CSS-animated. Visible from first
             paint while JS bundles stream in; dismissed by PreloaderDismiss

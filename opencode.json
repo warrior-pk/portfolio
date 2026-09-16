@@ -3,7 +3,27 @@
   "mcp": {
     "next-devtools": {
       "type": "local",
-      "command": ["bunx", "next-devtools-mcp@latest"],
+      "command": [
+        "bunx",
+        "next-devtools-mcp@latest"
+      ],
+      "enabled": true
+    },
+    "shadcn": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "shadcn@latest",
+        "mcp"
+      ],
+      "enabled": true
+    },
+    "context7": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "@upstash/context7-mcp"
+      ],
       "enabled": true
     }
   }
