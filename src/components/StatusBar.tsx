@@ -20,18 +20,24 @@ function useNow() {
 function useActiveSection() {
   const [active, setActive] = useState(SECTIONS[0]);
   useEffect(() => {
-    const onScroll = () => {
-      const probe = window.scrollY + window.innerHeight * 0.35;
-      let current = SECTIONS[0];
-      for (const section of SECTIONS) {
-        const el = document.getElementById(section.id);
-        if (el && el.offsetTop <= probe) current = section;
-      }
-      setActive(current);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    // Center-band probe, same as SectionDots: layout offsets drift under
+    // pinning, but the section crossing viewport center is always truth.
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const found = SECTIONS.find((s) => s.id === entry.target.id);
+            if (found) setActive(found);
+          }
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 },
+    );
+    for (const section of SECTIONS) {
+      const el = document.getElementById(section.id);
+      if (el) observer.observe(el);
+    }
+    return () => observer.disconnect();
   }, []);
   return active;
 }

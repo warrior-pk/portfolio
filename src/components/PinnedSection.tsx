@@ -21,9 +21,10 @@ interface PinnedSectionProps {
 
 /**
  * PinnedSection: the single pin/scrub seam. When the pointer-FX gate holds,
- * the stage pins at viewport top and scrubs its inner timeline over travel
- * derived from measured content height. Otherwise children render as a
- * normal full-screen section. Scrub owns entrances inside; the fade-up
+ * the stage pins 88px below viewport top — under the sticky masthead is
+ * never visible — and scrubs its inner timeline over travel derived from
+ * measured content height. Otherwise children render as a normal
+ * full-screen section. Scrub owns entrances inside; the fade-up
  * primitive must stay out via `Reveal disabled`.
  */
 export function PinnedSection({
@@ -48,7 +49,7 @@ export function PinnedSection({
         defaults: { ease: "none" },
         scrollTrigger: {
           trigger: stage,
-          start: "top top",
+          start: "top 88px",
           end: () => `+=${travelFor(stage.scrollHeight, window.innerHeight)}`,
           scrub: 1,
           pin: true,

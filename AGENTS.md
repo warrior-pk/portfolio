@@ -21,6 +21,12 @@ select single or multiple options (where applicable) using space, use arrows
 to switch questions, and enter to confirm. Never ask for decisions in plain
 text when a selectable UI is possible. Batch the full frontier in one round.
 
+### Commits
+
+Never commit or push without the user's explicit approval in the current
+session. Always finish the work, present the diff, and ask first — the user
+reviews everything before anything is committed.
+
 ### Versioning
 
 Bump the version in the same commit before every agent-made commit+push:

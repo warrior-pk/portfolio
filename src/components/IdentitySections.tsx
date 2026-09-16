@@ -45,7 +45,7 @@ export function AboutSection() {
       <section
         id="about"
         aria-labelledby="about-heading"
-        className="relative flex min-h-svh flex-col justify-center overflow-hidden border-b border-(--color-hairline) px-6 py-16 md:px-12 md:py-24"
+        className="relative flex min-h-[calc(100svh-6rem)] flex-col justify-center overflow-hidden border-b border-(--color-hairline) px-6 py-16 md:px-12 md:py-24"
       >
         <span
           aria-hidden
@@ -106,7 +106,7 @@ export function StackSection() {
       <section
         id="stack"
         aria-labelledby="stack-heading"
-        className="relative flex min-h-svh flex-col justify-center overflow-hidden border-b border-(--color-hairline) px-6 py-16 md:px-12 md:py-24"
+        className="relative flex min-h-[calc(100svh-6rem)] flex-col justify-center overflow-hidden border-b border-(--color-hairline) px-6 py-16 md:px-12 md:py-24"
       >
         <span
           aria-hidden

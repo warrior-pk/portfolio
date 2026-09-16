@@ -28,6 +28,14 @@ html {
   scroll-behavior: auto;
 }
 
+/* Bar-aware sections: landings (native anchors, scrollIntoView fallback,
+   and Lenis, which reads scroll-margin) stop below the sticky masthead
+   instead of sliding under it. The fixed status bar is cleared by the
+   route's bottom padding plus each section's own bottom rhythm. */
+section[id] {
+  scroll-margin-top: 88px;
+}
+
 html[data-world="dark-world"] {
   --color-void: var(--color-abyss);
   --color-panel: var(--color-abyss-panel);

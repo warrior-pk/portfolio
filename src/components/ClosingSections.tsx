@@ -30,7 +30,7 @@ export function ProjectsShelf() {
       <section
         id="projects"
         aria-labelledby="projects-heading"
-        className="relative flex min-h-svh flex-col justify-center overflow-hidden border-b border-(--color-hairline) px-6 py-16 md:px-12 md:py-28"
+        className="relative flex min-h-[calc(100svh-6rem)] flex-col justify-center overflow-hidden border-b border-(--color-hairline) px-6 py-16 md:px-12 md:py-28"
       >
         <span
           aria-hidden
@@ -108,21 +108,40 @@ export function ProjectsShelf() {
 /**
  * 05 Contact + footer. Links carry clearly-marked provisional hrefs;
  * footer carries exactly one cold one-liner in copy, zero visuals.
- * Unpinned finale: full-screen presence, normal flow, fade-up entrances.
+ * Pinned finale like every other SiteSection: LET'S TALK stages in
+ * with scroll, then releases to the route end.
  */
+const buildContactTimeline: StageTimelineBuilder = (tl, stage) => {
+  const q = gsap.utils.selector(stage);
+  tl.from(
+    q("[data-scrub-step]"),
+    { opacity: 0, y: 32, duration: 0.35, stagger: 0.1 },
+    0,
+  );
+};
+
 export function ContactFooter() {
+  const { pointerFX } = useMotionGate();
   return (
+    <PinnedSection buildTimeline={buildContactTimeline}>
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      className="relative flex min-h-svh flex-col justify-center overflow-hidden px-6 pt-16 pb-24 md:px-12 md:pt-28"
+      className="relative flex min-h-[calc(100svh-6rem)] flex-col justify-center overflow-hidden px-6 pt-16 pb-24 md:px-12 md:pt-28"
     >
-      <Reveal>
+      <span
+        aria-hidden
+        className="font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold text-(--color-lume)/[0.04] select-none md:text-[10rem]"
+      >
+        05
+      </span>
+      <Reveal disabled={pointerFX}>
         <p className="font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
           05 — contact
         </p>
         <h2
           id="contact-heading"
+          data-scrub-step
           className="font-display mt-6 text-[clamp(3.5rem,13vw,11rem)] leading-[0.85] font-semibold tracking-[-0.03em]"
         >
           LET&apos;S
@@ -130,16 +149,17 @@ export function ContactFooter() {
           TALK<span className="text-(--color-brass)">.</span>
         </h2>
       </Reveal>
-      <Reveal delay={0.1}>
+      <Reveal delay={0.1} disabled={pointerFX}>
         <a
+          data-scrub-step
           href="mailto:piyu8h@outlook.com"
           className="font-display mt-8 inline-block text-xl text-(--color-lume)/90 underline decoration-(--color-brass) decoration-2 underline-offset-8 transition-colors duration-200 hover:text-(--color-brass) md:text-2xl"
         >
           piyu8h@outlook.com
         </a>
       </Reveal>
-      <Reveal delay={0.14}>
-        <ul className="mt-10 grid grid-cols-2 gap-px border border-(--color-hairline) bg-(--color-hairline) md:grid-cols-4">
+      <Reveal delay={0.14} disabled={pointerFX}>
+        <ul data-scrub-step className="mt-10 grid grid-cols-2 gap-px border border-(--color-hairline) bg-(--color-hairline) md:grid-cols-4">
           {CONTACT_LINKS.map((link) => (
             <li key={link.label} className="bg-(--color-panel)">
               <a
@@ -168,5 +188,6 @@ export function ContactFooter() {
         </a>
       </div>
     </section>
+    </PinnedSection>
   );
 }
