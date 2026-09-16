@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import gsap from "gsap";
 import { useMotionGate } from "@/lib/motion-gate";
+import { computeLensedTarget, dampFactor, gravityRadiusFor } from "@/lib/gravity";
 
 /**
  * Cursor: small dot + soft trailing spotlight. Desktop-pointer only,
@@ -9,6 +11,9 @@ import { useMotionGate } from "@/lib/motion-gate";
  * reveal job is exposing faint grid labels in the hero.
  * When active, the native OS cursor is hidden (via `data-cursor="custom"`
  * on <html>) so the dot is the sole pointer.
+ * Gravity lensing: inside the hero the dot bends toward #god-particle
+ * (the black hole stays put — the light gets pulled), capped so clicks
+ * stay usable.
  */
 export function CursorSpotlight() {
   const { pointerFX } = useMotionGate();
@@ -32,39 +37,79 @@ export function CursorSpotlight() {
     const glow = glowRef.current;
     if (!dot || !glow) return;
 
-    let x = -100;
-    let y = -100;
+    gsap.ticker.lagSmoothing(500, 33);
+
+    const setDotX = gsap.quickSetter(dot, "x", "px");
+    const setDotY = gsap.quickSetter(dot, "y", "px");
+    const setGlowX = gsap.quickSetter(glow, "x", "px");
+    const setGlowY = gsap.quickSetter(glow, "y", "px");
+
+    // mx/my = true OS pointer, dx/dy = lensed dot, gx/gy = glow trail.
+    let mx = -100;
+    let my = -100;
+    let dx = -100;
+    let dy = -100;
     let gx = -100;
     let gy = -100;
-    let raf = 0;
     let visible = false;
+    let hole: HTMLElement | null = null;
 
     const onMove = (e: PointerEvent) => {
-      x = e.clientX;
-      y = e.clientY;
+      mx = e.clientX;
+      my = e.clientY;
       if (!visible) {
         visible = true;
+        dx = mx;
+        dy = my;
+        gx = mx;
+        gy = my;
+        hole ??= document.getElementById("god-particle");
         dot.style.opacity = "1";
         glow.style.opacity = "1";
       }
-      dot.style.transform = `translate(${x}px, ${y}px)`;
     };
     const onLeave = () => {
       visible = false;
       dot.style.opacity = "0";
       glow.style.opacity = "0";
     };
-    const trail = () => {
-      gx += (x - gx) * 0.12;
-      gy += (y - gy) * 0.12;
-      glow.style.transform = `translate(${gx}px, ${gy}px)`;
-      raf = requestAnimationFrame(trail);
+    const frame = (_time: number, deltaTime: number) => {
+      if (!visible) return;
+      // Bend the dot toward the black hole; outside the hero the
+      // distance exceeds the radius and the pull falls to zero.
+      let tx = mx;
+      let ty = my;
+      hole ??= document.getElementById("god-particle");
+      if (hole) {
+        const r = hole.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < window.innerHeight) {
+          const lens = computeLensedTarget(
+            mx,
+            my,
+            r.left + r.width / 2,
+            r.top + r.height / 2,
+            gravityRadiusFor(r.width, r.height),
+          );
+          tx = lens.x;
+          ty = lens.y;
+        }
+      }
+      const dotK = dampFactor(0.35, deltaTime);
+      const glowK = dampFactor(0.12, deltaTime);
+      dx += (tx - dx) * dotK;
+      dy += (ty - dy) * dotK;
+      gx += (dx - gx) * glowK;
+      gy += (dy - gy) * glowK;
+      setDotX(dx);
+      setDotY(dy);
+      setGlowX(gx);
+      setGlowY(gy);
     };
-    raf = requestAnimationFrame(trail);
+    gsap.ticker.add(frame);
     document.addEventListener("pointermove", onMove);
     document.documentElement.addEventListener("pointerleave", onLeave);
     return () => {
-      cancelAnimationFrame(raf);
+      gsap.ticker.remove(frame);
       document.removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("pointerleave", onLeave);
     };

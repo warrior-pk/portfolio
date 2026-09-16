@@ -4,18 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import {
   Color,
   IcosahedronGeometry,
-  MathUtils,
   Mesh,
   PerspectiveCamera,
-  Raycaster,
   Scene,
   ShaderMaterial,
   Timer,
-  Vector2,
-  Vector3,
   WebGLRenderer,
 } from "three";
+import gsap from "gsap";
 import { useMotionGate } from "@/lib/motion-gate";
+import { computeLensedTarget, dampFactor, gravityRadiusFor } from "@/lib/gravity";
 
 /**
  * HeroBlob — raw-three animated blob (ported off R3F: fiber still
@@ -189,12 +187,15 @@ function BlobCanvas({ color }: { color: string }) {
     scene.add(mesh);
 
     const timer = new Timer();
-    const raycaster = new Raycaster();
-    const pointer = new Vector2();
-    const target = new Vector3();
-    const current = new Vector3();
-    let hover = false;
-    let raf = 0;
+    // God-particle gravity model: the blob is the black hole — it stays
+    // put. Proximity (0..1) drives the intensity surge instead of motion.
+    // Driven by gsap.ticker (delta-corrected, lag-smoothed) and the shared
+    // gravity util so cursor + blob stay tuned identically.
+    gsap.ticker.lagSmoothing(500, 33);
+    let mouseX = -9999;
+    let mouseY = -9999;
+    let prox = 0;
+    let intensity = 0.5;
 
     const resize = () => {
       const w = host.clientWidth || 1;
@@ -208,41 +209,44 @@ function BlobCanvas({ color }: { color: string }) {
     ro.observe(host);
 
     const onMove = (e: PointerEvent) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.set(
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        -((e.clientY - rect.top) / rect.height) * 2 + 1,
-      );
-      raycaster.setFromCamera(pointer, camera);
-      hover = raycaster.intersectObject(mesh).length > 0;
-      target.set(pointer.x * 0.4, pointer.y * 0.4, 0);
+      mouseX = e.clientX;
+      mouseY = e.clientY;
     };
-    const onLeave = () => {
-      hover = false;
-    };
-    renderer.domElement.addEventListener("pointermove", onMove);
-    renderer.domElement.addEventListener("pointerleave", onLeave);
+    window.addEventListener("pointermove", onMove, { passive: true });
 
-    const tick = () => {
-      raf = requestAnimationFrame(tick);
+    const tick = (_time: number, deltaTime: number) => {
       timer.update();
-      material.uniforms.u_time.value = 0.4 * timer.getElapsed();
-      material.uniforms.u_intensity.value = MathUtils.lerp(
-        material.uniforms.u_intensity.value,
-        hover ? 0.7 : 0.5,
-        0.02,
-      );
-      current.lerp(target, 0.1);
-      mesh.position.copy(current);
+      const t = timer.getElapsed();
+      material.uniforms.u_time.value = 0.4 * t;
+
+      // Proximity in screen space: fresh rect each tick tracks scroll.
+      // Radius covers the whole blob plus aura, so the entire surface pulls.
+      const rect = renderer.domElement.getBoundingClientRect();
+      let proxTarget = 0;
+      if (rect.bottom > 0 && rect.top < window.innerHeight) {
+        proxTarget = computeLensedTarget(
+          mouseX,
+          mouseY,
+          rect.left + rect.width / 2,
+          rect.top + rect.height / 2,
+          gravityRadiusFor(rect.width, rect.height),
+        ).prox;
+      }
+      prox += (proxTarget - prox) * dampFactor(0.06, deltaTime);
+      intensity += (0.5 + prox * 0.6 - intensity) * dampFactor(0.08, deltaTime);
+
+      material.uniforms.u_intensity.value = intensity;
+      // Black hole stays anchored: only a tiny idle float + close-range swell.
+      mesh.position.set(Math.sin(t * 0.6) * 0.05, Math.cos(t * 0.5) * 0.05, 0);
+      mesh.scale.setScalar(1.15 + prox * 0.1);
       renderer.render(scene, camera);
     };
-    tick();
+    gsap.ticker.add(tick);
 
     return () => {
-      cancelAnimationFrame(raf);
+      gsap.ticker.remove(tick);
       ro.disconnect();
-      renderer.domElement.removeEventListener("pointermove", onMove);
-      renderer.domElement.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("pointermove", onMove);
       materialRef.current = null;
       mesh.geometry.dispose();
       material.dispose();
@@ -274,7 +278,10 @@ export function HeroBlob({ color = "#000000" }: { color?: string }) {
       aria-hidden
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >
-      <div className="pointer-events-auto absolute top-[12%] left-1/2 h-[68vw] w-[68vw] -translate-x-1/2 opacity-90 sm:top-[4%] sm:right-[3%] sm:left-auto sm:h-[50vmin] sm:w-[50vmin] sm:translate-x-0 md:opacity-100 lg:h-[56vmin] lg:w-[56vmin]">
+      <div
+        id="god-particle"
+        className="pointer-events-auto absolute top-[12%] left-1/2 h-[68vw] w-[68vw] -translate-x-1/2 opacity-90 sm:top-[4%] sm:right-[3%] sm:left-auto sm:h-[50vmin] sm:w-[50vmin] sm:translate-x-0 md:opacity-100 lg:h-[56vmin] lg:w-[56vmin]"
+      >
         <BlobCanvas color={color} />
       </div>
     </div>
