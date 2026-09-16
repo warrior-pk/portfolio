@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { VERSION } from "@/lib/site";
+import { SECTIONS, VERSION } from "@/lib/site";
 import { SweepingSecondsHand } from "./SweepingSecondsHand";
 
 function useNow() {
@@ -17,13 +17,33 @@ function useNow() {
   return now;
 }
 
+function useActiveSection() {
+  const [active, setActive] = useState(SECTIONS[0]);
+  useEffect(() => {
+    const onScroll = () => {
+      const probe = window.scrollY + window.innerHeight * 0.35;
+      let current = SECTIONS[0];
+      for (const section of SECTIONS) {
+        const el = document.getElementById(section.id);
+        if (el && el.offsetTop <= probe) current = section;
+      }
+      setActive(current);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return active;
+}
+
 /**
  * TUI chrome: slim persistent status bar owning the version string,
- * the ticking timestamp with mechanical-tick easing, and the Sweeping
- * seconds hand.
+ * the active-section readout, the ticking timestamp with mechanical-tick
+ * easing, and the Sweeping seconds hand.
  */
 export function StatusBar() {
   const now = useNow();
+  const active = useActiveSection();
 
   const hh = now ? String(now.getHours()).padStart(2, "0") : "--";
   const mm = now ? String(now.getMinutes()).padStart(2, "0") : "--";
@@ -38,6 +58,12 @@ export function StatusBar() {
       <div className="mx-auto flex h-9 max-w-6xl items-center gap-3 px-4 font-mono text-[11px] tracking-wide text-(--color-faint)">
         <span>{VERSION}</span>
         <span aria-hidden className="text-(--color-hairline)">
+          |
+        </span>
+        <span aria-hidden className="hidden text-(--color-brass) sm:inline">
+          {active.index} {active.label}
+        </span>
+        <span aria-hidden className="hidden text-(--color-hairline) sm:inline">
           |
         </span>
         <span className="tabular-nums" aria-label={`current time ${hh}:${mm}:${ss}`}>

@@ -15,7 +15,7 @@ export const SECTIONS: SiteSection[] = [
 ];
 
 /** Site version shown in the status bar. */
-export const VERSION = "v0.1";
+export const VERSION = "v0.2";
 
 export interface PeriodicTile {
   symbol: string;

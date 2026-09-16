@@ -7,11 +7,24 @@ import { useMotionGate } from "@/lib/motion-gate";
  * Cursor: small dot + soft trailing spotlight. Desktop-pointer only,
  * completely off on touch and under reduced-motion. The spotlight's only
  * reveal job is exposing faint grid labels in the hero.
+ * When active, the native OS cursor is hidden (via `data-cursor="custom"`
+ * on <html>) so the dot is the sole pointer.
  */
 export function CursorSpotlight() {
   const { pointerFX } = useMotionGate();
   const dotRef = useRef<HTMLDivElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!pointerFX) {
+      document.documentElement.removeAttribute("data-cursor");
+      return;
+    }
+    document.documentElement.dataset.cursor = "custom";
+    return () => {
+      document.documentElement.removeAttribute("data-cursor");
+    };
+  }, [pointerFX]);
 
   useEffect(() => {
     if (!pointerFX) return;
