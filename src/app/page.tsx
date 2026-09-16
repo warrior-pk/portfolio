@@ -1,18 +1,18 @@
 import { HeroSection } from "@/components/HeroSection";
+import { Masthead } from "@/components/Masthead";
 import { AboutSection, StackSection } from "@/components/IdentitySections";
 import { ContactFooter, ProjectsShelf } from "@/components/ClosingSections";
 import { Marquee } from "@/components/Marquee";
 
-/** Single route: masthead + hero, marquee, about/stack ledger pair, vault, contact. */
+/** Single route: masthead plus five stacked full-screen SiteSections. */
 export default function Home() {
   return (
     <>
+      <Masthead />
       <HeroSection />
       <Marquee />
-      <div className="grid border-b border-(--color-hairline) md:grid-cols-2">
-        <AboutSection />
-        <StackSection />
-      </div>
+      <AboutSection />
+      <StackSection />
       <ProjectsShelf />
       <ContactFooter />
     </>

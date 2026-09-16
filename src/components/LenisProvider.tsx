@@ -1,12 +1,23 @@
 "use client";
 
 import { useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useMotionGate } from "@/lib/motion-gate";
 import { registerScroller } from "@/lib/scroll";
 
+interface EngineInstance {
+  destroy: () => void;
+  scrollTo: (target: string) => void;
+  raf: (time: number) => void;
+  on: (event: "scroll", callback: () => void) => void;
+}
+
 /**
- * Lenis smooth-scroll provider. Loaded lazily so hero JS stays minimal;
- * fully off under reduced-motion (native instant jumps instead).
+ * Lenis smooth-scroll provider, driving through the shared GSAP ticker so
+ * the pin/scrub engine never drifts from the scroller. Loaded lazily so
+ * hero JS stays minimal; fully off under reduced-motion (native instant
+ * jumps instead). Pins re-measure on window load for slow fonts/media.
  */
 export function LenisProvider({ children }: { children: React.ReactNode }) {
   const { motionOK } = useMotionGate();
@@ -16,28 +27,40 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       registerScroller(null);
       return;
     }
-    let raf = 0;
-    let lenis: { destroy: () => void; scrollTo: (t: string) => void } | null =
-      null;
+    gsap.registerPlugin(ScrollTrigger);
+    let engine: EngineInstance | null = null;
     let cancelled = false;
+    let cleanupEngine = () => {};
 
     (async () => {
       const { default: Lenis } = await import("lenis");
       if (cancelled) return;
-      const instance = new Lenis({ duration: 1.1 });
-      lenis = instance;
+      const instance: EngineInstance = new Lenis({ duration: 1.1 });
+      engine = instance;
       registerScroller((target) => instance.scrollTo(`#${target}`));
-      const loop = (time: number) => {
-        instance.raf(time);
-        raf = requestAnimationFrame(loop);
+      const sync = () => {
+        ScrollTrigger.update();
       };
-      raf = requestAnimationFrame(loop);
+      instance.on("scroll", sync);
+      const drive = (time: number) => {
+        instance.raf(time * 1000);
+      };
+      gsap.ticker.add(drive);
+      gsap.ticker.lagSmoothing(0);
+      const refresh = () => {
+        ScrollTrigger.refresh();
+      };
+      window.addEventListener("load", refresh);
+      cleanupEngine = () => {
+        window.removeEventListener("load", refresh);
+        gsap.ticker.remove(drive);
+      };
     })();
 
     return () => {
       cancelled = true;
-      cancelAnimationFrame(raf);
-      lenis?.destroy();
+      cleanupEngine();
+      engine?.destroy();
       registerScroller(null);
     };
   }, [motionOK]);

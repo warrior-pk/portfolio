@@ -14,6 +14,7 @@ import {
 import gsap from "gsap";
 import { useMotionGate } from "@/lib/motion-gate";
 import { computeLensedTarget, dampFactor, gravityRadiusFor } from "@/lib/gravity";
+import { heroScrub } from "@/lib/scrub";
 
 /**
  * HeroBlob — raw-three animated blob (ported off R3F: fiber still
@@ -233,7 +234,11 @@ function BlobCanvas({ color }: { color: string }) {
         ).prox;
       }
       prox += (proxTarget - prox) * dampFactor(0.06, deltaTime);
-      intensity += (0.5 + prox * 0.6 - intensity) * dampFactor(0.08, deltaTime);
+      // Scroll joins pointer: the pinned hero writes shared progress, so
+      // the surge reads identically to cursor proximity (god-particle stays
+      // tuned in one place).
+      const surge = 0.5 + prox * 0.6 + heroScrub.value * 0.5;
+      intensity += (surge - intensity) * dampFactor(0.08, deltaTime);
 
       material.uniforms.u_intensity.value = intensity;
       // Black hole stays anchored: only a tiny idle float + close-range swell.

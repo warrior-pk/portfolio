@@ -3,6 +3,7 @@ import { JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/LenisProvider";
 import { CursorSpotlight } from "@/components/CursorSpotlight";
+import { SectionDots } from "@/components/SectionDots";
 import { StatusBar } from "@/components/StatusBar";
 import { TriquetraMark } from "@/components/TriquetraMark";
 import { PreloaderDismiss } from "@/components/PreloaderDismiss";
@@ -56,6 +57,7 @@ export default function RootLayout({
         </a>
         <LenisProvider>
           <CursorSpotlight />
+          <SectionDots />
           <main className="mx-auto max-w-6xl pb-16">{children}</main>
           <StatusBar />
           <PreloaderDismiss />

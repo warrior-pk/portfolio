@@ -8,20 +8,23 @@ import { MOTION_EASE } from "@/lib/motion-tokens";
 /**
  * Reveal: the single scroll-entrance primitive. Plain fade-up (≤300ms),
  * once per mount, final state rendered immediately under reduced-motion.
+ * `disabled` opts out inside pinned stages, where the scrub owns entrances.
  */
 export function Reveal({
   children,
   delay = 0,
   className,
+  disabled = false,
 }: {
   children: React.ReactNode;
   delay?: number;
   className?: string;
+  disabled?: boolean;
 }) {
   const { motionOK } = useMotionGate();
   const { ref, visible } = useOnceVisible<HTMLDivElement>();
 
-  if (!motionOK) {
+  if (!motionOK || disabled) {
     return <div className={className}>{children}</div>;
   }
 

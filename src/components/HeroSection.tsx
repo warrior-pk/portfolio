@@ -2,19 +2,15 @@
 
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
+import gsap from "gsap";
 import { useMotionGate } from "@/lib/motion-gate";
+import { heroScrub } from "@/lib/scrub";
+import { PinnedSection, type StageTimelineBuilder } from "./PinnedSection";
 
 const HeroBlob = dynamic(
   () => import("./HeroBlob").then((m) => m.HeroBlob),
   { ssr: false },
 );
-
-/**
- * 01 Hero: sticky masthead plus bottom-anchored oversized display type.
- * BUILD / BREAK (echo outline) / REPEAT rise line-by-line on load;
- * the terminal prompt is the single interactive moment.
- */
-const NAV = ["hero", "about", "stack", "projects", "contact"];
 
 const LINES = [
   { text: "BUILD", className: "" },
@@ -22,56 +18,63 @@ const LINES = [
   { text: "REPEAT", className: "" },
 ];
 
+/**
+ * Hero scrub narrative: display lines rise staggered as the pin arrives,
+ * then drift upward in parallax while the black-hole visual (fed via
+ * shared scrub progress) intensifies and the grid recedes.
+ */
+const buildHeroTimeline: StageTimelineBuilder = (tl, stage) => {
+  const q = gsap.utils.selector(stage);
+  tl.from(
+    q("[data-hero-line]"),
+    { yPercent: 110, duration: 0.45, stagger: 0.1 },
+    0,
+  )
+    .from(q("[data-hero-copy]"), { opacity: 0, y: 24, duration: 0.3 }, 0.35)
+    .to(q("[data-hero-heading]"), { yPercent: -12, duration: 0.55 }, 0.45)
+    .to(q("[data-hero-grid]"), { opacity: 0.25, duration: 0.55 }, 0.45);
+};
+
+/**
+ * 01 Hero: bottom-anchored oversized display type filling the viewport.
+ * Under the pointer-FX gate the scrub owns entrances; otherwise lines
+ * rise line-by-line on load as before.
+ */
 export function HeroSection() {
-  const { motionOK } = useMotionGate();
+  const { motionOK, pointerFX } = useMotionGate();
+  const scrubbed = pointerFX;
+  const loadAnimated = motionOK && !scrubbed;
 
   return (
-    <>
-      <header className="sticky top-0 z-50 border-b border-(--color-hairline) bg-(--color-void)/85 backdrop-blur-md">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 px-6 py-4 md:px-12">
-          <p className="font-display text-lg font-semibold tracking-tight md:text-2xl">
-            Piyush Kumar
-            <span aria-hidden className="ml-2 inline-block h-2 w-2 rounded-full bg-(--color-brass)" />
-          </p>
-          <nav
-            aria-label="sections"
-            className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-(--color-faint)"
-          >
-            {NAV.map((item, i) => (
-              <a
-                key={item}
-                href={`#${item}`}
-                className="transition-colors duration-200 hover:text-(--color-brass)"
-              >
-                <span aria-hidden className="mr-1 text-(--color-faint)/50">
-                  0{i + 1}
-                </span>
-                {item}
-              </a>
-            ))}
-          </nav>
-        </div>
-      </header>
-
+    <PinnedSection
+      onScrub={(progress) => {
+        heroScrub.value = progress;
+      }}
+      buildTimeline={buildHeroTimeline}
+    >
       <section
         id="hero"
         aria-labelledby="hero-heading"
         className="relative overflow-hidden border-b border-(--color-hairline)"
       >
-        <div aria-hidden className="blueprint-grid absolute inset-0" />
+        <div aria-hidden data-hero-grid className="blueprint-grid absolute inset-0" />
         <HeroBlob />
 
-        <div className="relative z-10 flex min-h-[92svh] flex-col justify-end px-6 pt-14 pb-10 md:px-12 md:pb-14">
-          <div className="mb-auto flex flex-wrap items-center justify-between gap-2 pt-2 font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
+        <div className="relative z-10 flex min-h-svh flex-col justify-end px-6 pt-14 pb-10 md:px-12 md:pb-14">
+          <div
+            data-hero-copy
+            className="mb-auto flex flex-wrap items-center justify-between gap-2 pt-2 font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase"
+          >
             <span>01 — hero</span>
           </div>
 
           <h1
             id="hero-heading"
+            data-hero-heading
             className="font-display mt-10 text-[clamp(4.5rem,17.5vw,16rem)] leading-[0.84] font-semibold tracking-[-0.03em]"
           >
             {LINES.map((line, i) =>
-              motionOK ? (
+              loadAnimated ? (
                 <span key={line.text} className="block overflow-hidden pb-[0.06em]">
                   <motion.span
                     className={`block ${line.className}`}
@@ -87,19 +90,24 @@ export function HeroSection() {
                   </motion.span>
                 </span>
               ) : (
-                <span key={line.text} className={`block ${line.className}`}>
-                  {line.text}
+                <span key={line.text} className="block overflow-hidden pb-[0.06em]">
+                  <span data-hero-line className={`block ${line.className}`}>
+                    {line.text}
+                  </span>
                 </span>
               ),
             )}
           </h1>
 
-          <p className="mt-8 max-w-md leading-relaxed text-(--color-lume)/85">
+          <p
+            data-hero-copy
+            className="mt-8 max-w-md leading-relaxed text-(--color-lume)/85"
+          >
             Software developer exploring tech — learning in public,
             building in the open.
           </p>
         </div>
       </section>
-    </>
+    </PinnedSection>
   );
 }
