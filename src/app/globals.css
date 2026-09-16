@@ -202,6 +202,28 @@ html[data-cursor="custom"] *::after {
   }
 }
 
+/* Breaking Bad logo heading: element boxes inline in the title,
+   in site colors like the table tiles. */
+.bb-tile {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.12em;
+  height: 1.12em;
+  background: var(--color-panel);
+  border: 1px solid var(--color-hairline);
+  border-radius: 4px;
+  color: var(--color-lume);
+  line-height: 1;
+}
+
+.bb-sym {
+  font-weight: 700;
+  font-size: 0.8em;
+  letter-spacing: -0.02em;
+}
+
 /* Element table: true 18-column chemistry geometry. Cells place by grid
    coordinates; the f-row is a detached grid with a lanthanide-style indent.
    Narrow screens collapse to auto-flow with gaps hidden. */
@@ -220,9 +242,20 @@ html[data-cursor="custom"] *::after {
   min-width: 0;
 }
 
-.element-frow {
+.element-fblock {
   margin-top: 1.25rem;
   padding-left: calc(100% / 18 * 2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.element-gap {
+  aspect-ratio: 1;
+  background: color-mix(in srgb, var(--color-panel) 55%, transparent);
+  border: 1px solid var(--color-hairline);
+  border-radius: 6px;
+  pointer-events: none;
 }
 
 .element-tile {
@@ -232,16 +265,17 @@ html[data-cursor="custom"] *::after {
   justify-content: space-between;
   aspect-ratio: 1;
   min-height: 0;
-  padding: 0.35rem;
+  padding: 0.5rem;
   overflow: hidden;
   background: var(--color-panel);
   border: 1px solid var(--color-hairline);
+  border-radius: 6px;
 }
 
 .element-version {
   align-self: flex-end;
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: 0.6rem;
   line-height: 1;
   color: var(--color-faint);
 }
@@ -249,14 +283,14 @@ html[data-cursor="custom"] *::after {
 .element-symbol {
   font-family: var(--font-mono);
   font-weight: 600;
-  font-size: clamp(0.85rem, 0.5rem + 1.4vw, 1.6rem);
+  font-size: clamp(1rem, 0.6rem + 1.8vw, 1.9rem);
   line-height: 1;
   color: var(--color-lume);
 }
 
 .element-name {
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: 0.6rem;
   line-height: 1.2;
   color: var(--color-faint);
   white-space: nowrap;
@@ -296,7 +330,7 @@ html[data-world="dark-world"] .bento-section {
   content: '';
   position: absolute;
   inset: 0;
-  padding: 6px;
+  padding: 1px;
   background: radial-gradient(var(--glow-radius, 200px) circle at var(--glow-x, 50%) var(--glow-y, 50%),
       rgba(var(--glow-color), calc(var(--glow-intensity, 0) * 0.8)) 0%,
       rgba(var(--glow-color), calc(var(--glow-intensity, 0) * 0.4)) 30%,
@@ -326,7 +360,11 @@ html[data-world="dark-world"] .bento-section {
     grid-row: auto;
   }
 
-  .element-frow {
+  .element-gap {
+    display: none;
+  }
+
+  .element-fblock {
     padding-left: 0;
   }
 }

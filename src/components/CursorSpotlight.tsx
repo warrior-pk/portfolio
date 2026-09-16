@@ -6,11 +6,9 @@ import { useMotionGate } from "@/lib/motion-gate";
 import { computeLensedTarget, dampFactor, gravityRadiusFor } from "@/lib/gravity";
 
 /**
- * Cursor: small dot + soft trailing spotlight. Desktop-pointer only,
- * completely off on touch and under reduced-motion. The spotlight's only
- * reveal job is exposing faint grid labels in the hero.
- * When active, the native OS cursor is hidden (via `data-cursor="custom"`
- * on <html>) so the dot is the sole pointer.
+ * Cursor: small dot, desktop-pointer only, completely off on touch and
+ * under reduced-motion. When active, the native OS cursor is hidden (via
+ * `data-cursor="custom"` on <html>) so the dot is the sole pointer.
  * Gravity lensing: inside the hero the dot bends toward #god-particle
  * (the black hole stays put — the light gets pulled), capped so clicks
  * stay usable.
@@ -18,7 +16,6 @@ import { computeLensedTarget, dampFactor, gravityRadiusFor } from "@/lib/gravity
 export function CursorSpotlight() {
   const { pointerFX } = useMotionGate();
   const dotRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!pointerFX) {
@@ -34,23 +31,18 @@ export function CursorSpotlight() {
   useEffect(() => {
     if (!pointerFX) return;
     const dot = dotRef.current;
-    const glow = glowRef.current;
-    if (!dot || !glow) return;
+    if (!dot) return;
 
     gsap.ticker.lagSmoothing(500, 33);
 
     const setDotX = gsap.quickSetter(dot, "x", "px");
     const setDotY = gsap.quickSetter(dot, "y", "px");
-    const setGlowX = gsap.quickSetter(glow, "x", "px");
-    const setGlowY = gsap.quickSetter(glow, "y", "px");
 
-    // mx/my = true OS pointer, dx/dy = lensed dot, gx/gy = glow trail.
+    // mx/my = true OS pointer, dx/dy = lensed dot.
     let mx = -100;
     let my = -100;
     let dx = -100;
     let dy = -100;
-    let gx = -100;
-    let gy = -100;
     let visible = false;
     let hole: HTMLElement | null = null;
 
@@ -61,17 +53,13 @@ export function CursorSpotlight() {
         visible = true;
         dx = mx;
         dy = my;
-        gx = mx;
-        gy = my;
         hole ??= document.getElementById("god-particle");
         dot.style.opacity = "1";
-        glow.style.opacity = "1";
       }
     };
     const onLeave = () => {
       visible = false;
       dot.style.opacity = "0";
-      glow.style.opacity = "0";
     };
     const frame = (_time: number, deltaTime: number) => {
       if (!visible) return;
@@ -95,15 +83,10 @@ export function CursorSpotlight() {
         }
       }
       const dotK = dampFactor(0.35, deltaTime);
-      const glowK = dampFactor(0.12, deltaTime);
       dx += (tx - dx) * dotK;
       dy += (ty - dy) * dotK;
-      gx += (dx - gx) * glowK;
-      gy += (dy - gy) * glowK;
       setDotX(dx);
       setDotY(dy);
-      setGlowX(gx);
-      setGlowY(gy);
     };
     gsap.ticker.add(frame);
     document.addEventListener("pointermove", onMove);
@@ -118,21 +101,10 @@ export function CursorSpotlight() {
   if (!pointerFX) return null;
 
   return (
-    <>
-      <div
-        ref={dotRef}
-        aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[70] -ml-[3px] -mt-[3px] h-1.5 w-1.5 rounded-full bg-(--color-brass) opacity-0"
-      />
-      <div
-        ref={glowRef}
-        aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[1] -ml-[160px] -mt-[160px] h-80 w-80 rounded-full opacity-0"
-        style={{
-          background:
-            "radial-gradient(circle, color-mix(in srgb, var(--color-brass) 7%, transparent), transparent 65%)",
-        }}
-      />
-    </>
+    <div
+      ref={dotRef}
+      aria-hidden
+      className="pointer-events-none fixed left-0 top-0 z-[70] -ml-[3px] -mt-[3px] h-1.5 w-1.5 rounded-full bg-(--color-brass) opacity-0"
+    />
   );
 }

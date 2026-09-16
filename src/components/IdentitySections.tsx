@@ -16,13 +16,13 @@ const buildAboutTimeline: StageTimelineBuilder = (tl, stage) => {
   );
 };
 
-/** Stack scrub: header steps in, then PeriodicTiles stagger. */
-const buildStackTimeline: StageTimelineBuilder = (tl, stage) => {
+/** Skills scrub: the whole table arrives as one unit, not tile by tile. */
+const buildSkillsTimeline: StageTimelineBuilder = (tl, stage) => {
   const q = gsap.utils.selector(stage);
   tl.from(q("[data-scrub-step]"), { opacity: 0, y: 28, duration: 0.3 }, 0).from(
-    q("[data-scrub-tile]"),
-    { opacity: 0, y: 32, scale: 0.96, duration: 0.35, stagger: 0.06 },
-    0.15,
+    q("[data-scrub-table]"),
+    { opacity: 0, y: 40, duration: 0.45 },
+    0.1,
   );
 };
 
@@ -84,15 +84,16 @@ export function AboutSection() {
 }
 
 /**
- * 03 Stack: skills rendered as a chemistry table of PeriodicTiles.
+ * 03 Skills: tech skills rendered as a chemistry table of PeriodicTiles,
+ * under a Breaking Bad logo heading.
  */
-export function StackSection() {
+export function SkillsSection() {
   const { pointerFX } = useMotionGate();
   return (
-    <PinnedSection buildTimeline={buildStackTimeline}>
+    <PinnedSection buildTimeline={buildSkillsTimeline}>
       <section
-        id="stack"
-        aria-labelledby="stack-heading"
+        id="skills"
+        aria-labelledby="skills-heading"
         className="relative flex min-h-[calc(100svh-6rem)] flex-col justify-center overflow-hidden border-b border-(--color-hairline) px-6 py-16 md:px-12 md:py-24"
       >
         <span
@@ -101,19 +102,29 @@ export function StackSection() {
         >
           03
         </span>
-        <Reveal disabled={pointerFX}>
+        <Reveal disabled={pointerFX} className="-mt-6 mb-6 md:-mt-10 md:mb-8">
           <h2
-            id="stack-heading"
+            id="skills-heading"
             data-scrub-step
+            aria-label="Tech Skills"
             className="font-display text-4xl font-semibold tracking-tight md:text-5xl"
           >
-            Stack
+            <span aria-hidden className="flex items-center gap-[0.06em]">
+              <span className="bb-tile">
+                <span className="bb-sym">Te</span>
+              </span>
+              <span>ch</span>
+            </span>
+            <span aria-hidden className="ml-[1.15em] -mt-[0.12em] flex items-center gap-[0.06em]">
+              <span className="bb-tile">
+                <span className="bb-sym">Sk</span>
+              </span>
+              <span>ills</span>
+            </span>
           </h2>
         </Reveal>
         <Reveal disabled={pointerFX}>
-          <div data-scrub-step>
-            <ElementTable />
-          </div>
+          <ElementTable />
         </Reveal>
       </section>
     </PinnedSection>

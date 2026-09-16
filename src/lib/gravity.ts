@@ -1,6 +1,6 @@
 /**
  * God-particle gravity: single source of truth for the black-hole pull.
- * Both CursorSpotlight (dot lensing) and HeroBlob (intensity surge) share
+ * Both the cursor dot lensing and the HeroBlob intensity surge share
  * these constants so the feel stays tuned identically.
  */
 

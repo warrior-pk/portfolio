@@ -3,7 +3,7 @@
 import { useMotionGate } from "@/lib/motion-gate";
 import { goToSection } from "@/lib/scroll";
 
-const NAV = ["hero", "about", "stack", "projects", "contact"];
+const NAV = ["hero", "about", "skills", "projects", "contact"];
 
 /**
  * 00 Masthead: sticky route chrome, independent of every SiteSection so

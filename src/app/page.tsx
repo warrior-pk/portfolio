@@ -1,6 +1,6 @@
 import { HeroSection } from "@/components/HeroSection";
 import { Masthead } from "@/components/Masthead";
-import { AboutSection, StackSection } from "@/components/IdentitySections";
+import { AboutSection, SkillsSection } from "@/components/IdentitySections";
 import { ContactFooter, ProjectsShelf } from "@/components/ClosingSections";
 import { Marquee } from "@/components/Marquee";
 
@@ -12,7 +12,7 @@ export default function Home() {
       <HeroSection />
       <Marquee />
       <AboutSection />
-      <StackSection />
+      <SkillsSection />
       <ProjectsShelf />
       <ContactFooter />
     </>
