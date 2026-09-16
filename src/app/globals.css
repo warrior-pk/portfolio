@@ -16,7 +16,6 @@
   --color-faint: #a3a097;
   --color-hairline: #26262b;
   --color-brass: #d9a441;
-  --color-tile: #2f7d3b;
 
   --color-abyss: #060a12;
   --color-abyss-panel: #0b1220;
@@ -200,6 +199,135 @@ html[data-cursor="custom"] *::after {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Element table: true 18-column chemistry geometry. Cells place by grid
+   coordinates; the f-row is a detached grid with a lanthanide-style indent.
+   Narrow screens collapse to auto-flow with gaps hidden. */
+.element-grid {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(0, 1fr));
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.element-grid [data-cell] {
+  grid-column: var(--ecol);
+  grid-row: var(--erow);
+  min-width: 0;
+}
+
+.element-frow {
+  margin-top: 1.25rem;
+  padding-left: calc(100% / 18 * 2);
+}
+
+.element-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  aspect-ratio: 1;
+  min-height: 0;
+  padding: 0.35rem;
+  overflow: hidden;
+  background: var(--color-panel);
+  border: 1px solid var(--color-hairline);
+}
+
+.element-version {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  line-height: 1;
+  color: var(--color-faint);
+}
+
+.element-symbol {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: clamp(0.85rem, 0.5rem + 1.4vw, 1.6rem);
+  line-height: 1;
+  color: var(--color-lume);
+}
+
+.element-name {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  line-height: 1.2;
+  color: var(--color-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.element-future {
+  aspect-ratio: 1;
+  border: 1px dashed var(--color-hairline);
+}
+
+/* Mastery: learning tiles sit faded with a dashed border until hovered
+   or focused, when they read at full strength like mastered tiles. */
+.element-grid [data-mastery="learning"] .element-tile {
+  opacity: 0.55;
+  border-style: dashed;
+}
+
+.element-grid [data-mastery="learning"]:hover .element-tile,
+.element-grid [data-mastery="learning"]:focus-visible .element-tile {
+  opacity: 1;
+}
+
+/* Tile border glow: the MagicBento card seam, parameterized by the live
+   --glow-color (brass, cold in dark-world) set on the table container. */
+.bento-section {
+  --glow-color: 217, 164, 65;
+  --glow-intensity: 0;
+}
+
+html[data-world="dark-world"] .bento-section {
+  --glow-color: 122, 162, 255;
+}
+
+.card--border-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 6px;
+  background: radial-gradient(var(--glow-radius, 200px) circle at var(--glow-x, 50%) var(--glow-y, 50%),
+      rgba(var(--glow-color), calc(var(--glow-intensity, 0) * 0.8)) 0%,
+      rgba(var(--glow-color), calc(var(--glow-intensity, 0) * 0.4)) 30%,
+      transparent 60%);
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.card--border-glow:hover {
+  box-shadow: 0 4px 20px rgba(46, 24, 78, 0.4), 0 0 30px rgba(var(--glow-color), 0.2);
+}
+
+@media (max-width: 768px) {
+  .element-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .element-grid [data-cell] {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .element-frow {
+    padding-left: 0;
   }
 }
 

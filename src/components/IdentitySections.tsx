@@ -1,9 +1,9 @@
 "use client";
 
 import gsap from "gsap";
-import { PERIODIC_TILES } from "@/lib/site";
 import { useMotionGate } from "@/lib/motion-gate";
 import { Reveal } from "./Reveal";
+import { ElementTable } from "./ElementTable";
 import { PinnedSection, type StageTimelineBuilder } from "./PinnedSection";
 
 /** About scrub: copy blocks arrive in steps; more copy extends the pin. */
@@ -75,7 +75,7 @@ export function AboutSection() {
             data-scrub-step
             className="mt-8 border-l-2 border-(--color-brass) pl-4 font-mono text-xs leading-relaxed text-(--color-faint)"
           >
-            {PERIODIC_TILES.map((t) => t.name.toLowerCase()).join(" · ")}
+            typescript · python · java · react · node · nextjs · spring boot
           </p>
         </Reveal>
       </section>
@@ -84,8 +84,7 @@ export function AboutSection() {
 }
 
 /**
- * 03 Stack: skills rendered exclusively as Periodic tiles (symbol + version)
- * on filled green, the only Breaking Bad visual on the site.
+ * 03 Stack: skills rendered as a chemistry table of PeriodicTiles.
  */
 export function StackSection() {
   const { pointerFX } = useMotionGate();
@@ -111,37 +110,11 @@ export function StackSection() {
             Stack
           </h2>
         </Reveal>
-        <ul
-          aria-label="skills as periodic tiles"
-          className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 md:grid-cols-2 xl:grid-cols-4"
-        >
-          {PERIODIC_TILES.map((tile, i) => (
-            <li key={tile.symbol}>
-              <Reveal
-                delay={Math.min(i * 0.06, 0.36)}
-                disabled={pointerFX}
-                className="h-full"
-              >
-                <div
-                  data-scrub-tile
-                  className="group h-full border border-black/50 bg-(--color-tile) p-4 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-(--color-brass) hover:shadow-[0_12px_32px_-12px_color-mix(in_srgb,var(--color-brass)_45%,transparent)]"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="font-mono text-4xl font-semibold text-white transition-transform duration-300 ease-out group-hover:scale-110">
-                      {tile.symbol}
-                    </span>
-                    <span className="font-mono text-xs tabular-nums text-white/90">
-                      {tile.version}
-                    </span>
-                  </div>
-                  <div className="mt-3 font-mono text-xs text-white/85">
-                    {tile.name}
-                  </div>
-                </div>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+        <Reveal disabled={pointerFX}>
+          <div data-scrub-step>
+            <ElementTable />
+          </div>
+        </Reveal>
       </section>
     </PinnedSection>
   );
