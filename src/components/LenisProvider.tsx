@@ -4,11 +4,11 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useMotionGate } from "@/lib/motion-gate";
-import { registerScroller } from "@/lib/scroll";
+import { registerScroller, stageTargetFor } from "@/lib/scroll";
 
 interface EngineInstance {
   destroy: () => void;
-  scrollTo: (target: string) => void;
+  scrollTo: (target: string | HTMLElement) => void;
   raf: (time: number) => void;
   on: (event: "scroll", callback: () => void) => void;
 }
@@ -37,7 +37,13 @@ export function LenisProvider({ children }: { children: React.ReactNode }) {
       if (cancelled) return;
       const instance: EngineInstance = new Lenis({ duration: 1.1 });
       engine = instance;
-      registerScroller((target) => instance.scrollTo(`#${target}`));
+      registerScroller((target) => {
+        // Resolve the layout-stable wrapper: Lenis honors its scroll-margin
+        // and its rect stays truthful while a pin is active.
+        const node = stageTargetFor(target);
+        if (node instanceof HTMLElement) instance.scrollTo(node);
+        else instance.scrollTo(`#${target}`);
+      });
       const sync = () => {
         ScrollTrigger.update();
       };

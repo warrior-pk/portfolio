@@ -21,7 +21,8 @@ const LINES = [
 /**
  * Hero scrub narrative (exit only): the heading drifts upward in parallax
  * while the black-hole visual (fed via shared scrub progress) intensifies
- * and the grid recedes. The text entrance belongs to load, not scroll.
+ * and the grid recedes. The text entrance belongs to load, not scroll, so
+ * the reveal starts at the pin with no approach lead.
  */
 const buildHeroTimeline: StageTimelineBuilder = (tl, stage) => {
   const q = gsap.utils.selector(stage);
@@ -46,6 +47,7 @@ export function HeroSection() {
         heroScrub.value = progress;
       }}
       buildTimeline={buildHeroTimeline}
+      revealFrom={{ start: "top 88px", lead: () => 0 }}
     >
       <section
         id="hero"

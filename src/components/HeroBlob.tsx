@@ -285,7 +285,7 @@ export function HeroBlob({ color = "#000000" }: { color?: string }) {
     >
       <div
         id="god-particle"
-        className="pointer-events-auto absolute top-[12%] left-1/2 h-[68vw] w-[68vw] -translate-x-1/2 opacity-90 sm:top-[4%] sm:right-[3%] sm:left-auto sm:h-[50vmin] sm:w-[50vmin] sm:translate-x-0 md:opacity-100 lg:h-[56vmin] lg:w-[56vmin]"
+        className="pointer-events-none absolute top-[12%] left-1/2 h-[68vw] w-[68vw] -translate-x-1/2 opacity-90 sm:top-[4%] sm:right-[3%] sm:left-auto sm:h-[50vmin] sm:w-[50vmin] sm:translate-x-0 md:opacity-100 lg:h-[56vmin] lg:w-[56vmin]"
       >
         <BlobCanvas color={color} />
       </div>

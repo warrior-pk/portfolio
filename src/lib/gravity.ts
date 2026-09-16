@@ -5,7 +5,7 @@
  */
 
 export const GRAVITY_RADIUS = 520;
-export const GRAVITY_AURA = 420;
+export const GRAVITY_AURA = 280;
 export const MAX_PULL = 90;
 
 export interface LensedTarget {

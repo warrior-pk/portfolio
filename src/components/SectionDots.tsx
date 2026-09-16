@@ -3,19 +3,8 @@
 import { useEffect, useState } from "react";
 import { SECTIONS } from "@/lib/site";
 import { useMotionGate } from "@/lib/motion-gate";
-import { getScroller } from "@/lib/scroll";
+import { goToSection } from "@/lib/scroll";
 import { progressFor } from "@/lib/scrub";
-
-function goTo(id: string, smooth: boolean) {
-  const scroller = getScroller();
-  if (scroller) {
-    scroller(id);
-    return;
-  }
-  document
-    .getElementById(id)
-    ?.scrollIntoView({ behavior: smooth ? "smooth" : "auto" });
-}
 
 /**
  * SectionDots: side-dot plus progress chrome marking the active
@@ -63,6 +52,32 @@ export function SectionDots() {
     };
   }, [pointerFX]);
 
+  // Digit keys 1-5 jump between SiteSections. Gated on motion only (not
+  // pointer type): keyboard users exist on touch hardware too. Ignored
+  // while typing or with modifier keys held.
+  useEffect(() => {
+    if (!motionOK) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      const index = Number.parseInt(e.key, 10);
+      if (index >= 1 && index <= SECTIONS.length) {
+        goToSection(SECTIONS[index - 1].id, true);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [motionOK]);
+
   if (!pointerFX) return null;
 
   return (
@@ -76,14 +91,15 @@ export function SectionDots() {
         aria-label="section navigation"
         className="fixed top-1/2 right-3 z-40 flex -translate-y-1/2 flex-col gap-3 md:right-5"
       >
-        {SECTIONS.map((section) => {
+        {SECTIONS.map((section, i) => {
           const current = active === section.id;
           return (
             <button
               key={section.id}
               type="button"
-              onClick={() => goTo(section.id, motionOK)}
+              onClick={() => goToSection(section.id, motionOK)}
               aria-label={`Go to ${section.label}`}
+              aria-keyshortcuts={`${i + 1}`}
               aria-current={current ? "true" : undefined}
               className="group flex items-center justify-end gap-2 p-1"
             >

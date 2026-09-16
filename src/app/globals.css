@@ -32,7 +32,8 @@ html {
    and Lenis, which reads scroll-margin) stop below the sticky masthead
    instead of sliding under it. The fixed status bar is cleared by the
    route's bottom padding plus each section's own bottom rhythm. */
-section[id] {
+section[id],
+[data-stage] {
   scroll-margin-top: 88px;
 }
 
