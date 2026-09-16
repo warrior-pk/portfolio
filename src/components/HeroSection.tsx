@@ -94,21 +94,10 @@ export function HeroSection() {
             )}
           </h1>
 
-          <div className="mt-8 flex flex-col gap-2 md:flex-row md:items-end md:justify-between md:gap-10">
-            <p className="max-w-md leading-relaxed text-(--color-lume)/85">
-              Software developer exploring tech — learning in public,
-              building in the open.
-            </p>
-            <a
-              href="#about"
-              className="group w-fit font-mono text-xs tracking-[0.25em] text-(--color-faint) uppercase transition-colors duration-200 hover:text-(--color-brass)"
-            >
-              scroll to begin{" "}
-              <span aria-hidden className="inline-block transition-transform duration-200 group-hover:translate-y-1">
-                ↓
-              </span>
-            </a>
-          </div>
+          <p className="mt-8 max-w-md leading-relaxed text-(--color-lume)/85">
+            Software developer exploring tech — learning in public,
+            building in the open.
+          </p>
         </div>
       </section>
     </>

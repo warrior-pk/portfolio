@@ -8,3 +8,5 @@ out/
 next-env.d.ts
 # misc
 .DS_Store
+# local opencode plugin config (skills live tracked under .agents/skills/)
+.opencode/

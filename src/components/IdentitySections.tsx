@@ -76,17 +76,12 @@ export function StackSection() {
       </span>
       <Reveal>
         <SectionTag index="03" id="stack" />
-        <div className="mt-6 flex flex-wrap items-baseline justify-between gap-2">
-          <h2
-            id="stack-heading"
-            className="font-display text-4xl font-semibold tracking-tight md:text-5xl"
-          >
-            Stack
-          </h2>
-          <p className="font-mono text-xs text-(--color-faint)">
-            {String(PERIODIC_TILES.length).padStart(2, "0")} elements
-          </p>
-        </div>
+        <h2
+          id="stack-heading"
+          className="font-display mt-6 text-4xl font-semibold tracking-tight md:text-5xl"
+        >
+          Stack
+        </h2>
       </Reveal>
       <ul
         aria-label="skills as periodic tiles"
@@ -112,11 +107,6 @@ export function StackSection() {
           </li>
         ))}
       </ul>
-      <Reveal delay={0.1}>
-        <p className="mt-6 font-mono text-[11px] text-(--color-faint)/70">
-          latest versions · verified 2026-09-13
-        </p>
-      </Reveal>
     </section>
   );
 }

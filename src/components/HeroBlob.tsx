@@ -1,16 +1,29 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Color, MathUtils, Vector3 } from "three";
-import type * as THREE from "three";
+import { useEffect, useRef, useState } from "react";
+import {
+  Color,
+  IcosahedronGeometry,
+  MathUtils,
+  Mesh,
+  PerspectiveCamera,
+  Raycaster,
+  Scene,
+  ShaderMaterial,
+  Timer,
+  Vector2,
+  Vector3,
+  WebGLRenderer,
+} from "three";
 import { useMotionGate } from "@/lib/motion-gate";
 
 /**
- * HeroBlob — R3F animated blob adapted from ui-layouts `r3f-blob`.
- * Self-contained: own shaders, own Canvas, transparent background.
- * No drei Environment — the ShaderMaterial is unlit, so lights/HDRIs
- * would only add network fetches without changing the look.
+ * HeroBlob — raw-three animated blob (ported off R3F: fiber still
+ * constructs the deprecated THREE.Clock internally, which spams the
+ * console on every Canvas mount; THREE.Timer is warning-free).
+ * Self-contained: own shaders, own renderer, transparent background.
+ * No lights/HDRIs — the ShaderMaterial is unlit, so they would only
+ * add network fetches without changing the look.
  */
 
 const vertexShader = /* glsl */ `
@@ -131,54 +144,117 @@ void main() {
 }
 `;
 
-function BlobMesh({ color }: { color: string }) {
-  const mesh = useRef<THREE.Mesh>(null);
-  const hover = useRef(false);
-  const targetPosition = useRef(new Vector3(0, 0, 0));
-  const currentPosition = useRef(new Vector3(0, 0, 0));
+function BlobCanvas({ color }: { color: string }) {
+  const hostRef = useRef<HTMLDivElement>(null);
+  const materialRef = useRef<ShaderMaterial | null>(null);
 
-  const uniforms = useMemo(
-    () => ({
-      u_time: { value: 0 },
-      u_intensity: { value: 0.3 },
-      u_color: { value: new Color(color) },
-    }),
-    [color],
-  );
+  // Late color changes reuse the live material — no renderer rebuild.
+  useEffect(() => {
+    materialRef.current?.uniforms.u_color.value.set(color);
+  }, [color]);
 
-  useFrame((state) => {
-    const { clock, mouse } = state;
-    if (!mesh.current) return;
-    const material = mesh.current.material as THREE.ShaderMaterial;
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
 
-    material.uniforms.u_time.value = 0.4 * clock.getElapsedTime();
-    material.uniforms.u_intensity.value = MathUtils.lerp(
-      material.uniforms.u_intensity.value,
-      hover.current ? 0.7 : 0.5,
-      0.02,
-    );
+    const renderer = new WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance",
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setClearColor(0x000000, 0);
+    renderer.domElement.style.display = "block";
+    renderer.domElement.style.width = "100%";
+    renderer.domElement.style.height = "100%";
+    host.appendChild(renderer.domElement);
 
-    targetPosition.current.set(mouse.x * 0.4, mouse.y * 0.4, 0);
-    currentPosition.current.lerp(targetPosition.current, 0.1);
-    mesh.current.position.copy(currentPosition.current);
-  });
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0, 9.5);
 
-  return (
-    <mesh
-      ref={mesh}
-      scale={1.15}
-      position={[0, 0, 0]}
-      onPointerOver={() => (hover.current = true)}
-      onPointerOut={() => (hover.current = false)}
-    >
-      <icosahedronGeometry args={[2, 20]} />
-      <shaderMaterial
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        uniforms={uniforms}
-      />
-    </mesh>
-  );
+    const material = new ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms: {
+        u_time: { value: 0 },
+        u_intensity: { value: 0.3 },
+        u_color: { value: new Color(color) },
+      },
+    });
+    materialRef.current = material;
+
+    const mesh = new Mesh(new IcosahedronGeometry(2, 20), material);
+    mesh.scale.setScalar(1.15);
+    scene.add(mesh);
+
+    const timer = new Timer();
+    const raycaster = new Raycaster();
+    const pointer = new Vector2();
+    const target = new Vector3();
+    const current = new Vector3();
+    let hover = false;
+    let raf = 0;
+
+    const resize = () => {
+      const w = host.clientWidth || 1;
+      const h = host.clientHeight || 1;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(host);
+
+    const onMove = (e: PointerEvent) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      pointer.set(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1,
+      );
+      raycaster.setFromCamera(pointer, camera);
+      hover = raycaster.intersectObject(mesh).length > 0;
+      target.set(pointer.x * 0.4, pointer.y * 0.4, 0);
+    };
+    const onLeave = () => {
+      hover = false;
+    };
+    renderer.domElement.addEventListener("pointermove", onMove);
+    renderer.domElement.addEventListener("pointerleave", onLeave);
+
+    const tick = () => {
+      raf = requestAnimationFrame(tick);
+      timer.update();
+      material.uniforms.u_time.value = 0.4 * timer.getElapsed();
+      material.uniforms.u_intensity.value = MathUtils.lerp(
+        material.uniforms.u_intensity.value,
+        hover ? 0.7 : 0.5,
+        0.02,
+      );
+      current.lerp(target, 0.1);
+      mesh.position.copy(current);
+      renderer.render(scene, camera);
+    };
+    tick();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      renderer.domElement.removeEventListener("pointermove", onMove);
+      renderer.domElement.removeEventListener("pointerleave", onLeave);
+      materialRef.current = null;
+      mesh.geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+      if (renderer.domElement.parentElement === host) {
+        host.removeChild(renderer.domElement);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return <div ref={hostRef} className="h-full w-full" />;
 }
 
 export function HeroBlob({ color = "#000000" }: { color?: string }) {
@@ -199,13 +275,7 @@ export function HeroBlob({ color = "#000000" }: { color?: string }) {
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >
       <div className="pointer-events-auto absolute top-[12%] left-1/2 h-[68vw] w-[68vw] -translate-x-1/2 opacity-90 sm:top-[4%] sm:right-[3%] sm:left-auto sm:h-[50vmin] sm:w-[50vmin] sm:translate-x-0 md:opacity-100 lg:h-[56vmin] lg:w-[56vmin]">
-        <Canvas
-          dpr={[1, 1.75]}
-          camera={{ position: [0.0, 0.0, 9.5], fov: 42 }}
-          gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-        >
-          <BlobMesh color={color} />
-        </Canvas>
+        <BlobCanvas color={color} />
       </div>
     </div>
   );

@@ -21,6 +21,14 @@ select single or multiple options (where applicable) using space, use arrows
 to switch questions, and enter to confirm. Never ask for decisions in plain
 text when a selectable UI is possible. Batch the full frontier in one round.
 
+### Versioning
+
+Bump the version in the same commit before every agent-made commit+push:
+`package.json` (full semver) keeps `src/lib/site.ts` `VERSION` (`v<major>.<minor>`)
+in step. Fix commit → patch only (`0.2.0` → `0.2.1`, site string unchanged).
+Feature commit → minor (`0.2.0` → `0.3.0`, site string `v0.2` → `v0.3`).
+Chore/docs-only commit → patch. Major (`1.0.0` / `v1`) only on explicit user say-so.
+
 ### Domain docs
 
 Single-context layout: root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.
