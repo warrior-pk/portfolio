@@ -6,17 +6,6 @@ import { useMotionGate } from "@/lib/motion-gate";
 import { Reveal } from "./Reveal";
 import { PinnedSection, type StageTimelineBuilder } from "./PinnedSection";
 
-function SectionTag({ index, id }: { index: string; id: string }) {
-  return (
-    <p className="flex items-center justify-between font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
-      <span>
-        {index} — {id}
-      </span>
-      <span aria-hidden className="h-px w-16 bg-(--color-hairline)" />
-    </p>
-  );
-}
-
 /** About scrub: copy blocks arrive in steps; more copy extends the pin. */
 const buildAboutTimeline: StageTimelineBuilder = (tl, stage) => {
   const q = gsap.utils.selector(stage);
@@ -54,11 +43,10 @@ export function AboutSection() {
           02
         </span>
         <Reveal disabled={pointerFX}>
-          <SectionTag index="02" id="about" />
           <h2
             id="about-heading"
             data-scrub-step
-            className="font-display mt-6 text-4xl font-semibold tracking-tight md:text-5xl"
+            className="font-display text-4xl font-semibold tracking-tight md:text-5xl"
           >
             About
           </h2>
@@ -115,11 +103,10 @@ export function StackSection() {
           03
         </span>
         <Reveal disabled={pointerFX}>
-          <SectionTag index="03" id="stack" />
           <h2
             id="stack-heading"
             data-scrub-step
-            className="font-display mt-6 text-4xl font-semibold tracking-tight md:text-5xl"
+            className="font-display text-4xl font-semibold tracking-tight md:text-5xl"
           >
             Stack
           </h2>

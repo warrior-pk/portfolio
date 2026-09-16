@@ -58,9 +58,7 @@ export function HeroSection() {
         <HeroBlob />
 
         <div className="relative z-10 flex min-h-[calc(100svh-6rem)] flex-col justify-end px-6 pt-14 pb-10 md:px-12 md:pb-14">
-          <div className="mb-auto flex flex-wrap items-center justify-between gap-2 pt-2 font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
-            <span>01 — hero</span>
-          </div>
+          <div aria-hidden className="mb-auto pt-2" />
 
           <h1
             id="hero-heading"

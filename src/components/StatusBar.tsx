@@ -2,20 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { SECTIONS, VERSION } from "@/lib/site";
-import { SweepingSecondsHand } from "./SweepingSecondsHand";
-
-function useNow() {
-  // Null on server + first client render so SSR HTML matches; the clock
-  // starts after mount. Rendering `new Date()` during render would hydrate
-  // against a stale server timestamp.
-  const [now, setNow] = useState<Date | null>(null);
-  useEffect(() => {
-    setNow(new Date());
-    const t = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(t);
-  }, []);
-  return now;
-}
 
 function useActiveSection() {
   const [active, setActive] = useState(SECTIONS[0]);
@@ -43,17 +29,11 @@ function useActiveSection() {
 }
 
 /**
- * TUI chrome: slim persistent status bar owning the version string,
- * the active-section readout, the ticking timestamp with mechanical-tick
- * easing, and the Sweeping seconds hand.
+ * TUI chrome: slim persistent status bar owning the version string and
+ * the active-section readout.
  */
 export function StatusBar() {
-  const now = useNow();
   const active = useActiveSection();
-
-  const hh = now ? String(now.getHours()).padStart(2, "0") : "--";
-  const mm = now ? String(now.getMinutes()).padStart(2, "0") : "--";
-  const ss = now ? String(now.getSeconds()).padStart(2, "0") : "--";
 
   return (
     <div
@@ -68,20 +48,6 @@ export function StatusBar() {
         </span>
         <span aria-hidden className="hidden text-(--color-brass) sm:inline">
           {active.index} {active.label}
-        </span>
-        <span aria-hidden className="hidden text-(--color-hairline) sm:inline">
-          |
-        </span>
-        <span className="tabular-nums" aria-label={`current time ${hh}:${mm}:${ss}`}>
-          {hh}
-          <span className="tick-colon">:</span>
-          {mm}
-          <span className="tick-colon">:</span>
-          {ss}
-        </span>
-        <span className="ml-auto flex items-center gap-2">
-          <span className="hidden sm:inline">scroll</span>
-          <SweepingSecondsHand />
         </span>
       </div>
     </div>

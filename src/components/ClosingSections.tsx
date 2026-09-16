@@ -39,8 +39,7 @@ export function ProjectsShelf() {
           04
         </span>
         <Reveal disabled={pointerFX}>
-          <p className="flex items-center justify-between font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
-            <span>04 — projects</span>
+          <p className="flex items-center justify-end font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
             <span className="flex items-center gap-2">
               <span aria-hidden className="shelf-pulse inline-block h-1.5 w-1.5 rounded-full bg-(--color-brass)" />
               unlocking
@@ -136,13 +135,10 @@ export function ContactFooter() {
         05
       </span>
       <Reveal disabled={pointerFX}>
-        <p className="font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
-          05 — contact
-        </p>
         <h2
           id="contact-heading"
           data-scrub-step
-          className="font-display mt-6 text-[clamp(3.5rem,13vw,11rem)] leading-[0.85] font-semibold tracking-[-0.03em]"
+          className="font-display text-[clamp(3.5rem,13vw,11rem)] leading-[0.85] font-semibold tracking-[-0.03em]"
         >
           LET&apos;S
           <br />
