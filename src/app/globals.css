@@ -298,9 +298,93 @@ html[data-cursor="custom"] *::after {
   text-overflow: ellipsis;
 }
 
-.element-future {
-  aspect-ratio: 1;
-  border: 1px dashed var(--color-hairline);
+/* Hover detail card: anchored to the tile, opens on hover and keyboard
+   focus, never intercepts the pointer. Top rows flip below; edge columns
+   align to the tile edge instead of centering. */
+.element-grid [data-cell] {
+  position: relative;
+}
+
+.tile-card {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  translate: var(--cx, -50%) var(--cy, 4px);
+  width: max-content;
+  max-width: 220px;
+  padding: 0.65rem 0.75rem;
+  background: var(--color-panel);
+  border: 1px solid var(--color-hairline);
+  border-radius: 8px;
+  box-shadow: 0 16px 40px -16px rgba(0, 0, 0, 0.7);
+  z-index: 30;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  /* Hover intent: opens instantly, closes after a beat so the cursor can
+     travel across neighboring tiles without strobing cards. */
+  transition:
+    opacity 0.18s ease,
+    translate 0.18s ease,
+    visibility 0s linear 0.35s;
+}
+
+.element-grid [data-cell]:hover > .tile-card,
+.element-grid [data-cell]:focus-within > .tile-card {
+  opacity: 1;
+  visibility: visible;
+  --cy: 0;
+  transition-delay: 0s;
+}
+
+.element-grid [data-cell][data-flip] > .tile-card {
+  bottom: auto;
+  top: calc(100% + 8px);
+  --cy: -4px;
+}
+
+.element-grid [data-cell][data-edge-l] > .tile-card {
+  left: -4px;
+  --cx: 0;
+}
+
+.element-grid [data-cell][data-edge-r] > .tile-card {
+  left: auto;
+  right: -4px;
+  --cx: 0;
+}
+
+.tile-card-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-lume);
+}
+
+.tile-card-sub {
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  color: var(--color-faint);
+}
+
+.tile-card-meta {
+  margin-top: 0.2rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-faint);
+}
+
+.tile-card-proj {
+  margin-top: 0.55rem;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-align: left;
+  color: var(--color-faint);
+  border: 1px solid var(--color-hairline);
+  border-radius: 6px;
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 /* Mastery: learning tiles sit faded with a dashed border until hovered

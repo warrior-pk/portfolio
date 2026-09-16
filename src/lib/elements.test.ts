@@ -75,13 +75,14 @@ describe("periodic table geometry", () => {
   });
 });
 
-describe("describeTile", () => {
-  it("announces name, version, and mastery", () => {
-    expect(describeTile(PERIODIC_TILES[0])).toBe("HTML, version 5, mastered");
+describe("describeTile", () => {  it("announces name, version, and mastery", () => {
+    expect(describeTile(PERIODIC_TILES[0])).toBe(
+      "HTML, version 5, 3y experience, mastered",
+    );
     const learning = PERIODIC_TILES.find((t) => t.mastery === "learning");
     expect(learning).toBeDefined();
     expect(describeTile(learning!)).toBe(
-      `${learning!.name}, version ${learning!.version}, learning`,
+      `${learning!.name}, version ${learning!.version}, ${learning!.yoe} experience, learning`,
     );
   });
 });
@@ -132,6 +133,24 @@ describe("full table shape", () => {  it("frames seven periods of eighteen colum
       expect(slot.col).toBeGreaterThanOrEqual(1);
       expect(slot.col).toBeLessThanOrEqual(TABLE_COLS);
       if (slot.f === 1) expect(taken.has(`${slot.col}`)).toBe(false);
+    }
+  });
+});
+
+describe("hover card details", () => {
+  const WEB = ["Ht", "Cs", "Sa", "Tw", "Js", "Re", "Ts", "No", "Ex", "Nx"];
+
+  it("names every skill in two to five words", () => {
+    for (const tile of PERIODIC_TILES) {
+      const words = tile.blurb.trim().split(/\s+/).length;
+      expect(words).toBeGreaterThanOrEqual(2);
+      expect(words).toBeLessThanOrEqual(5);
+    }
+  });
+
+  it("credits three years for web skills and one for the rest", () => {
+    for (const tile of PERIODIC_TILES) {
+      expect(tile.yoe).toBe(WEB.includes(tile.symbol) ? "3y" : "1y");
     }
   });
 });

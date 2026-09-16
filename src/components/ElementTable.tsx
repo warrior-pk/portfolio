@@ -80,6 +80,7 @@ export function ElementTable() {
                 key={tile.symbol}
                 tile={tile}
                 row={row}
+                below={row <= 2}
                 glow={glow}
                 active={pointerFX}
               />
@@ -98,6 +99,7 @@ export function ElementTable() {
                     key={actual.symbol}
                     tile={actual}
                     row={1}
+                    below={false}
                     glow={glow}
                     active={pointerFX}
                   />
@@ -109,7 +111,7 @@ export function ElementTable() {
                     key={`future-${f}:${col}`}
                     data-cell
                     aria-hidden
-                    className="element-future"
+                    className="element-gap"
                     style={{ "--ecol": col, "--erow": 1 } as React.CSSProperties}
                   />
                 );
@@ -134,11 +136,14 @@ export function ElementTable() {
 function ElementCell({
   tile,
   row,
+  below,
   glow,
   active,
 }: {
   tile: PeriodicTile;
   row: number;
+  /** Open the detail card below the tile (top rows) instead of above. */
+  below: boolean;
   glow: string;
   active: boolean;
 }) {
@@ -153,17 +158,33 @@ function ElementCell({
       <span className="element-name">{tile.name}</span>
     </>
   );
+  const card = (
+    <div className="tile-card" aria-hidden="true">
+      <p className="tile-card-title">{tile.name}</p>
+      <p className="tile-card-sub">{tile.blurb}</p>
+      <p className="tile-card-meta">
+        v{tile.version} · {tile.yoe} exp
+      </p>
+      <button type="button" disabled className="tile-card-proj">
+        Projects →
+      </button>
+    </div>
+  );
 
   if (!active) {
     return (
       <li
         data-cell
         data-mastery={tile.mastery}
+        data-flip={below || undefined}
+        data-edge-l={tile.col <= 2 || undefined}
+        data-edge-r={tile.col >= 17 || undefined}
         style={placement}
         tabIndex={0}
         aria-label={describeTile(tile)}
       >
         <div className="element-tile">{face}</div>
+        {card}
       </li>
     );
   }
@@ -172,6 +193,9 @@ function ElementCell({
     <li
       data-cell
       data-mastery={tile.mastery}
+      data-flip={below || undefined}
+      data-edge-l={tile.col <= 2 || undefined}
+      data-edge-r={tile.col >= 17 || undefined}
       style={placement}
       tabIndex={0}
       aria-label={describeTile(tile)}
@@ -187,6 +211,7 @@ function ElementCell({
       >
         {face}
       </ParticleCard>
+      {card}
     </li>
   );
 }
