@@ -135,9 +135,11 @@ body {
   -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 40%, black 30%, transparent 75%);
 }
 
-/* Outlined echo line: stroke only, no fill */
+/* Outlined echo line: stroke only, no fill. Stroke scales with font
+   size — a fixed 1px outline turns jagged and washed out on oversized
+   display type (too few pixels for anti-aliasing to work with). */
 .text-stroke {
-  -webkit-text-stroke: 1px color-mix(in srgb, var(--color-faint) 65%, transparent);
+  -webkit-text-stroke: clamp(1px, 0.018em, 3px) color-mix(in srgb, var(--color-faint) 65%, transparent);
   color: transparent;
 }
 
