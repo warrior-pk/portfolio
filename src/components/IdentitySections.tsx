@@ -38,10 +38,9 @@ export function AboutSection() {
       >
         <span
           aria-hidden
-          className="font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold text-(--color-lume)/[0.04] select-none md:text-[10rem]"
-        >
-          02
-        </span>
+          data-num="02"
+          className="bg-numeral font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold select-none md:text-[10rem]"
+        />
         <Reveal disabled={pointerFX}>
           <h2
             id="about-heading"
@@ -98,10 +97,9 @@ export function SkillsSection() {
       >
         <span
           aria-hidden
-          className="font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold text-(--color-lume)/[0.04] select-none md:text-[10rem]"
-        >
-          03
-        </span>
+          data-num="03"
+          className="bg-numeral font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold select-none md:text-[10rem]"
+        />
         <Reveal disabled={pointerFX} className="-mt-6 mb-6 md:-mt-10 md:mb-8">
           <h2
             id="skills-heading"

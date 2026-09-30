@@ -22,7 +22,7 @@ export function Masthead() {
         </p>
         <nav
           aria-label="sections"
-          className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-(--color-faint)"
+          className="flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-(--color-faint)"
         >
           {NAV.map((item, i) => (
             <a
@@ -32,9 +32,9 @@ export function Masthead() {
                 e.preventDefault();
                 goToSection(item, motionOK);
               }}
-              className="transition-colors duration-200 hover:text-(--color-brass)"
+              className="inline-block py-1 -my-1 transition-colors duration-200 hover:text-(--color-brass)"
             >
-              <span aria-hidden className="mr-1 text-(--color-faint)/50">
+              <span aria-hidden className="mr-1 text-(--color-faint)/75">
                 0{i + 1}
               </span>
               {item}

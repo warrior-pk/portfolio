@@ -34,10 +34,9 @@ export function ProjectsShelf() {
       >
         <span
           aria-hidden
-          className="font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold text-(--color-lume)/[0.04] select-none md:text-[10rem]"
-        >
-          04
-        </span>
+          data-num="04"
+          className="bg-numeral font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold select-none md:text-[10rem]"
+        />
         <Reveal disabled={pointerFX}>
           <p className="flex items-center justify-end font-mono text-[11px] tracking-[0.25em] text-(--color-faint) uppercase">
             <span className="flex items-center gap-2">
@@ -80,7 +79,7 @@ export function ProjectsShelf() {
                     <span>SLOT {slot}</span>
                     <span aria-hidden className="shelf-pulse inline-block h-1.5 w-1.5 rounded-full bg-(--color-faint)/60" />
                   </div>
-                  <p className="font-mono text-xs tracking-[0.25em] text-(--color-faint)/60 uppercase">
+                  <p className="font-mono text-xs tracking-[0.25em] text-(--color-faint)/75 uppercase">
                     sealed
                   </p>
                 </div>
@@ -131,10 +130,9 @@ export function ContactFooter() {
     >
       <span
         aria-hidden
-        className="font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold text-(--color-lume)/[0.04] select-none md:text-[10rem]"
-      >
-        05
-      </span>
+        data-num="05"
+        className="bg-numeral font-display pointer-events-none absolute -top-4 right-4 text-[7rem] leading-none font-semibold select-none md:text-[10rem]"
+      />
       <Reveal disabled={pointerFX}>
         <h2
           id="contact-heading"
@@ -177,7 +175,7 @@ export function ContactFooter() {
           ))}
         </ul>
       </Reveal>
-      <div className="mt-12 flex flex-wrap items-center justify-end gap-3 font-mono text-[11px] text-(--color-faint)/70">
+      <div className="mt-12 flex flex-wrap items-center justify-end gap-3 font-mono text-[11px] text-(--color-faint)/75">
         <a
           href="#hero"
           className="tracking-[0.25em] uppercase transition-colors duration-200 hover:text-(--color-brass)"
