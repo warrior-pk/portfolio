@@ -378,7 +378,14 @@ export default function RootLayout({
             after hydration, or by the inline fallback below if React fails.
             The mark itself is static (no breathe loop): an animating LCP
             candidate keeps repainting and inflates LCP to removal time. */}
-        <div id="__preloader" aria-hidden="true">
+        <div
+          id="__preloader"
+          aria-hidden="true"
+          // The inline dismissal script can add .is-done before hydration
+          // finishes (it fires on DOMContentLoaded, deliberately earlier
+          // than React). That divergence is intentional — silence it.
+          suppressHydrationWarning
+        >
           <TriquetraMark className="veil-mark" />
         </div>
         <script
