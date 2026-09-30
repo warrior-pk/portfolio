@@ -25,6 +25,15 @@
         "@upstash/context7-mcp"
       ],
       "enabled": true
+    },
+    "chrome-devtools": {
+      "type": "local",
+      "command": [
+        "bunx",
+        "chrome-devtools-mcp@latest",
+        "--executablePath=/usr/bin/chromium"
+      ],
+      "enabled": true
     }
   }
 }
