@@ -19,19 +19,20 @@ export function PreloaderDismiss() {
       window.setTimeout(() => el.remove(), 700);
     };
 
-    if (document.readyState === "complete") {
-      const t = window.setTimeout(done, 250);
-      return () => window.clearTimeout(t);
-    }
-
-    const onLoad = () => window.setTimeout(done, 250);
+    // Lift as soon as the document can paint (DOMContentLoaded), not on
+    // full load: every image/font past this point delays first paint.
     // Safety net: never trap the user behind the veil.
-    const fallback = window.setTimeout(done, 4000);
-    window.addEventListener("load", onLoad, { once: true });
-    return () => {
-      window.clearTimeout(fallback);
-      window.removeEventListener("load", onLoad);
-    };
+    if (document.readyState === "loading") {
+      const onReady = () => window.setTimeout(done, 150);
+      const fallback = window.setTimeout(done, 1500);
+      document.addEventListener("DOMContentLoaded", onReady, { once: true });
+      return () => {
+        window.clearTimeout(fallback);
+        document.removeEventListener("DOMContentLoaded", onReady);
+      };
+    }
+    const t = window.setTimeout(done, 150);
+    return () => window.clearTimeout(t);
   }, []);
 
   return null;

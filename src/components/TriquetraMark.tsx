@@ -1,23 +1,23 @@
 type Props = {
   className?: string;
-  /** When true, the mark breathes via pure CSS (used by the HTML-first veil). */
-  animated?: boolean;
   title?: string;
 };
 
 /**
- * Dark triquetra artwork (public/dark_logo.png).
+ * Dark triquetra artwork (public/dark_logo-veil.webp).
  * Served as a small pre-sized copy so the preloader veil paints fast.
+ * Explicit dimensions avoid layout shift; fetchpriority keeps the
+ * LCP-candidate veil mark first in line.
  */
-export function TriquetraMark({ className, animated = false, title }: Props) {
-  const cls = [className, animated ? "veil-breathe" : null]
-    .filter(Boolean)
-    .join(" ");
+export function TriquetraMark({ className, title }: Props) {
   return (
     <img
-      src="/dark_logo-veil.png"
+      src="/dark_logo-veil.webp"
       alt={title ?? "Triquetra mark"}
-      className={cls}
+      width={400}
+      height={333}
+      fetchPriority="high"
+      className={className}
       draggable={false}
     />
   );

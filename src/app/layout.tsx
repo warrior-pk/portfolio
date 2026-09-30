@@ -375,13 +375,15 @@ export default function RootLayout({
       <body className="font-display bg-(--color-void) text-(--color-lume)">
         {/* HTML-first veil: server-rendered, CSS-animated. Visible from first
             paint while JS bundles stream in; dismissed by PreloaderDismiss
-            after hydration, or by the inline fallback below if React fails. */}
+            after hydration, or by the inline fallback below if React fails.
+            The mark itself is static (no breathe loop): an animating LCP
+            candidate keeps repainting and inflates LCP to removal time. */}
         <div id="__preloader" aria-hidden="true">
-          <TriquetraMark animated className="veil-mark" />
+          <TriquetraMark className="veil-mark" />
         </div>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){function d(){var e=document.getElementById("__preloader");if(e){e.classList.add("is-done");setTimeout(function(){e.remove()},700)}}window.addEventListener("load",function(){setTimeout(d,250)},{once:true});setTimeout(d,4000)})();`,
+            __html: `(function(){function d(){var e=document.getElementById("__preloader");if(e){e.classList.add("is-done");setTimeout(function(){e.remove()},700)}}function go(){setTimeout(d,150)}if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",go,{once:true})}else{go()}setTimeout(d,1500)})();`,
           }}
         />
         <script

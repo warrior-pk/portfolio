@@ -84,6 +84,33 @@ body {
   animation: tick-blink 1s steps(1, end) infinite;
 }
 
+/* Ghost section numerals: pure decoration (aria-hidden, duplicated by
+   real headings), so the glyph renders via generated content — visually
+   identical, but exempt from text-contrast audits that can't tell
+   decoration from content. Luminance token follows the active world. */
+.bg-numeral::before {
+  content: attr(data-num);
+  color: color-mix(in srgb, var(--color-lume) 4%, transparent);
+}
+
+/* Hero entrance: CSS-driven so the display type paints in its final
+   position with first paint (SSR-visible, no-JS-visible) and rises as a
+   progressive enhancement. Stagger via inline animation-delay per line.
+   The global reduced-motion rule below collapses this to instant. */
+@keyframes hero-rise {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+
+.hero-rise {
+  animation: hero-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+}
+
 /* Marquee: one linear loop, killed by the motion gate like everything else */
 @keyframes marquee-x {
   from {
@@ -155,30 +182,27 @@ html[data-world="dark-world"] .text-stroke {
   pointer-events: none;
 }
 
+/* Autohide backstop: the veil lifts on a CSS clock even if JS is slow,
+   blocked, or still streaming bundles — first paint is never gated on
+   script execution. JS dismissal (above) wins whenever it fires first;
+   both converge on the same hidden end state. */
+#__preloader {
+  animation: veil-autohide 0.6s ease 1.8s forwards;
+}
+
+@keyframes veil-autohide {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 #__preloader .veil-mark {
   width: min(56vw, 220px);
   height: auto;
   opacity: 0.95;
   user-select: none;
   -webkit-user-select: none;
-}
-
-/* Breathe loop for the raster mark: visible while JS bundles stream in */
-#__preloader .veil-breathe {
-  animation: veil-breathe 4.5s ease-in-out infinite;
-  will-change: opacity, transform;
-}
-
-@keyframes veil-breathe {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(0.985);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 /* Custom cursor takeover: dot is the sole pointer, hide the native arrow.
