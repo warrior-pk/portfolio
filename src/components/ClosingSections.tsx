@@ -93,6 +93,7 @@ export function ProjectsShelf() {
             meanwhile —{" "}
             <a
               href="https://github.com/warrior-pk"
+              rel="noopener"
               className="text-(--color-lume) underline decoration-(--color-brass) decoration-2 underline-offset-4 transition-colors duration-200 hover:text-(--color-brass)"
             >
               browse the workshop on github
@@ -160,6 +161,7 @@ export function ContactFooter() {
             <li key={link.label} className="bg-(--color-panel)">
               <a
                 href={link.href}
+                rel={link.href.startsWith("http") ? "me noopener" : undefined}
                 data-placeholder={link.placeholder ? "true" : undefined}
                 className="group flex items-center justify-between p-6 font-mono text-sm text-(--color-lume) transition-colors duration-200 hover:bg-(--color-brass) hover:text-[#0a0a0b] md:p-8"
               >

@@ -65,9 +65,14 @@ export function HeroSection() {
             data-hero-heading
             className="font-display mt-10 text-[clamp(4.5rem,min(17.5vw,28svh),16rem)] leading-[0.84] font-semibold tracking-[-0.03em]"
           >
+            {/* Crawler + screen-reader identity: the visual lines are brand
+                type, so the h1 carries the name and role as hidden text. */}
+            <span className="sr-only">
+              Piyush Kumar — full-stack software developer:{" "}
+            </span>
             {LINES.map((line, i) =>
               motionOK ? (
-                <span key={line.text} className="block overflow-hidden pb-[0.06em]">
+                <span key={line.text} aria-hidden className="block overflow-hidden pb-[0.06em]">
                   <motion.span
                     className={`block ${line.className}`}
                     initial={{ y: "110%" }}
@@ -82,7 +87,7 @@ export function HeroSection() {
                   </motion.span>
                 </span>
               ) : (
-                <span key={line.text} className={`block ${line.className}`}>
+                <span key={line.text} aria-hidden className={`block ${line.className}`}>
                   {line.text}
                 </span>
               ),
