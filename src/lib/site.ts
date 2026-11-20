@@ -45,11 +45,13 @@ export const FUTURE_SLOTS: FutureSlot[] = [
 ];
 
 /**
- * True void in the main frame: like the reference table, rows 1-3 hold
- * only the outer columns, so the middle columns render no cell at all.
+ * True void in the main frame: like the reference table, period 1 holds
+ * only its two edge elements, and periods 2-3 hold only the outer
+ * columns, so the middle columns render no cell at all.
  */
 export function isTableVoid(row: number, col: number): boolean {
-  return row >= 1 && row <= 3 && col >= 3 && col <= 12;
+  if (row === 1) return col >= 2 && col <= 17;
+  return row >= 2 && row <= 3 && col >= 3 && col <= 12;
 }
 
 /** Screen-reader and keyboard label for a tile: name, version, mastery. */

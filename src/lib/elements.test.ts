@@ -88,8 +88,10 @@ describe("describeTile", () => {  it("announces name, version, and mastery", () 
 });
 
 describe("isTableVoid", () => {
-  it("leaves the top-3-row middle open like the reference table", () => {
+  it("leaves the middle open like the reference table", () => {
+    expect(isTableVoid(1, 2)).toBe(true);
     expect(isTableVoid(1, 5)).toBe(true);
+    expect(isTableVoid(1, 17)).toBe(true);
     expect(isTableVoid(2, 3)).toBe(true);
     expect(isTableVoid(3, 12)).toBe(true);
   });
@@ -112,9 +114,10 @@ describe("full table shape", () => {  it("frames seven periods of eighteen colum
 
   it("renders every block: skills plus empties fill the whole frame", () => {
     const mainCount = PERIODIC_TILES.filter((t) => t.row !== 0).length;
-    const voids = 10 * 3;
+    // Period 1 voids 16 middle columns; periods 2-3 void 10 each.
+    const voids = 16 + 10 * 2;
     const empties = TABLE_COLS * TABLE_PERIODS - mainCount - voids;
-    expect(empties).toBe(74);
+    expect(empties).toBe(68);
     const fEmpties =
       FBLOCK_COLS * FROW_ROWS -
       PERIODIC_TILES.filter((t) => t.row === 0).length -
