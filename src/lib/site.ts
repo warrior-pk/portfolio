@@ -15,7 +15,7 @@ export const SECTIONS: SiteSection[] = [
 ];
 
 /** Site version shown in the status bar. */
-export const VERSION = "v0.7-beta";
+export const VERSION = "v0.8-beta";
 
 export type Mastery = "mastered" | "learning";
 

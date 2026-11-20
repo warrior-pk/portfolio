@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Space_Grotesk, Geist } from "next/font/google";
 import "./globals.css";
+import "./ledger.css";
 import { LenisProvider } from "@/components/LenisProvider";
 import { CursorSpotlight } from "@/components/CursorSpotlight";
 import { SectionDots } from "@/components/SectionDots";

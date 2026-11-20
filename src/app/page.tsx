@@ -1,7 +1,6 @@
 import dynamic from "next/dynamic";
 import { HeroSection } from "@/components/HeroSection";
 import { Masthead } from "@/components/Masthead";
-import { Marquee } from "@/components/Marquee";
 
 /**
  * Below-fold SiteSections load behind dynamic boundaries: their HTML is
@@ -27,7 +26,6 @@ export default function Home() {
     <>
       <Masthead />
       <HeroSection />
-      <Marquee />
       <AboutSection />
       <SkillsSection />
       <ProjectsShelf />

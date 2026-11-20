@@ -107,13 +107,13 @@ export function SkillsSection() {
             aria-label="Tech Skills"
             className="font-display text-4xl font-semibold tracking-tight md:text-5xl"
           >
-            <span aria-hidden className="flex items-center gap-[0.06em]">
+            <span aria-hidden className="flex items-center gap-[0.02em]">
               <span className="bb-tile">
                 <span className="bb-sym">Te</span>
               </span>
               <span>ch</span>
             </span>
-            <span aria-hidden className="ml-[1.15em] -mt-[0.12em] flex items-center gap-[0.06em]">
+            <span aria-hidden className="ml-[1.15em] -mt-[0.12em] flex items-center gap-[0.02em]">
               <span className="bb-tile">
                 <span className="bb-sym">Sk</span>
               </span>

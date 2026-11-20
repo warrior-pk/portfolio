@@ -8,10 +8,6 @@ Single-route personal portfolio for Piyush Kumar. Five numbered sections on one 
 One of the five numbered full-screen sections on the route: hero, about, skills, projects, contact.
 _Avoid_: page, tab, screen
 
-**Interstitial**:
-A normal-flow strip between full-screen SiteSections. Never pinned, never in dots; the marquee is the current one.
-_Avoid_: divider, banner
-
 **PeriodicTile**:
 A tech skill rendered as a periodic-table cell: big symbol, name, and version at top-right. Full opacity means mastered, faded with a dashed border means still learning, and blank gap cells hold the chemistry-table geometry.
 _Avoid_: skill badge, tech card, pill
