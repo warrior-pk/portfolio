@@ -15,9 +15,20 @@ export const SECTIONS: SiteSection[] = [
 ];
 
 /** Site version shown in the status bar. */
-export const VERSION = "v0.8-beta";
+export const VERSION = "v0.9";
 
 export type Mastery = "mastered" | "learning";
+
+export type SkillFamily =
+  | "Javascript(frontend)"
+  | "Typescript(backend)"
+  | "Java"
+  | "Python"
+  | "Database"
+  | "Devops"
+  | "Cloud"
+  | "Monitoring"
+  | "Performance";
 
 /** Chemistry-table frame: eighteen columns, seven periods. */
 export const TABLE_COLS = 18;
@@ -33,15 +44,14 @@ export interface FutureSlot {
   col: number;
 }
 
-/** Reserved f-block capacity for skills not yet started. */
+/** Reserved f-block capacity for skills not yet added to the portfolio. */
 export const FUTURE_SLOTS: FutureSlot[] = [
   { f: 1, col: 7 },
-  { f: 1, col: 8 },
-  { f: 2, col: 4 },
-  { f: 2, col: 5 },
-  { f: 2, col: 6 },
-  { f: 2, col: 7 },
-  { f: 2, col: 8 },
+  { f: 1, col: 15 },
+  { f: 2, col: 9 },
+  { f: 2, col: 13 },
+  { f: 2, col: 14 },
+  { f: 2, col: 15 },
 ];
 
 /**
@@ -56,58 +66,129 @@ export function isTableVoid(row: number, col: number): boolean {
 
 /** Screen-reader and keyboard label for a tile: name, version, mastery. */
 export function describeTile(tile: PeriodicTile): string {
-  return `${tile.name}, version ${tile.version}, ${tile.yoe} experience, ${tile.mastery}`;
+  const details = [tile.name, `${BLOCK_LABELS[tile.block]} block`];
+  if (tile.version) details.push(`version ${tile.version}`);
+  if (tile.yoe) details.push(`${tile.yoe} experience`);
+  details.push(tile.mastery);
+  return details.join(", ");
 }
 
 export interface PeriodicTile {
   symbol: string;
-  /** Latest version of the skills item — verified 2026-09-16, re-check on touch. */
-  version: string;
+  /** Version and experience stay optional so unconfirmed details are not invented. */
+  version?: string;
   name: string;
-  /** Full display name for the hover card, two to five words. */
-  blurb: string;
-  /** Years of experience, as shown on the hover card. */
-  yoe: string;
+  family: SkillFamily;
+  /** Optional short description for the hover card. */
+  blurb?: string;
+  /** Years of experience, when the user has supplied or confirmed them. */
+  yoe?: string;
   mastery: Mastery;
+  /** Skill family. Learning tiles stay grouped with their family. */
+  block: SkillBlock;
   /** Chemistry-table column (1..18). */
   col: number;
-  /** Chemistry-table row (1..3); 0 is the detached f-row for learning. */
+  /** Chemistry-table row (1..7); 0 is the detached f-block. */
   row: number;
+  /** F-block row (1..2), only for detached f-block tiles. */
+  frow?: number;
 }
 
+export type SkillBlock = "S" | "P" | "D" | "F";
+
+export const BLOCK_LABELS: Record<SkillBlock, string> = {
+  S: "Python",
+  P: "Java",
+  D: "JavaScript / TypeScript",
+  F: "DevOps / databases",
+};
+
+type TileSeed = Omit<PeriodicTile, "mastery"> & { mastery?: Mastery };
+const tile = (seed: TileSeed): PeriodicTile => ({ mastery: "mastered", ...seed });
+
 /**
- * Skills renders as a chemistry table: families sit relatively close with no
- * names or labels, in four periods shaped like the reference table — a
- * short first row, two full rows, and a fourth row starting the d-block.
- * The detached f-row holds learning elements, and blank cells hold the rest
- * of the geometry.
+ * Skills follow the user's custom block taxonomy. Learning items retain
+ * their source block while using P's group-18 column as a shared status lane.
+ * The detached f-block contains DevOps, data, cloud, and observability tools.
  */
 export const PERIODIC_TILES: PeriodicTile[] = [
-  { symbol: "Ht", version: "5", name: "HTML", blurb: "HTML Markup Language", yoe: "3y", mastery: "mastered", col: 1, row: 1 },
-  { symbol: "Nx", version: "16.3", name: "Next.js", blurb: "Next.js React Framework", yoe: "3y", mastery: "mastered", col: 18, row: 1 },
-  { symbol: "Cs", version: "3", name: "CSS", blurb: "Cascading Style Sheets", yoe: "3y", mastery: "mastered", col: 1, row: 2 },
-  { symbol: "Sa", version: "1.93", name: "Sass", blurb: "Sass CSS Preprocessor", yoe: "3y", mastery: "mastered", col: 2, row: 2 },
-  { symbol: "Tw", version: "4.3", name: "Tailwind", blurb: "Tailwind CSS Framework", yoe: "3y", mastery: "mastered", col: 13, row: 2 },
-  { symbol: "Js", version: "ES25", name: "JavaScript", blurb: "JavaScript Programming Language", yoe: "3y", mastery: "mastered", col: 14, row: 2 },
-  { symbol: "Re", version: "19.3", name: "React", blurb: "React UI Library", yoe: "3y", mastery: "mastered", col: 15, row: 2 },
-  { symbol: "Ts", version: "5.9", name: "TypeScript", blurb: "TypeScript Programming Language", yoe: "3y", mastery: "mastered", col: 16, row: 2 },
-  { symbol: "No", version: "24", name: "Node", blurb: "Node.js JavaScript Runtime", yoe: "3y", mastery: "mastered", col: 17, row: 2 },
-  { symbol: "Ex", version: "5.1", name: "Express", blurb: "Express Web Framework", yoe: "3y", mastery: "mastered", col: 18, row: 2 },
-  { symbol: "Py", version: "3.14", name: "Python", blurb: "Python Programming Language", yoe: "1y", mastery: "mastered", col: 1, row: 3 },
-  { symbol: "Fa", version: "0.121", name: "FastAPI", blurb: "FastAPI Python Framework", yoe: "1y", mastery: "mastered", col: 2, row: 3 },
-  { symbol: "Mo", version: "8.0", name: "MongoDB", blurb: "MongoDB Document Database", yoe: "1y", mastery: "mastered", col: 13, row: 3 },
-  { symbol: "Rd", version: "8.0", name: "Redis", blurb: "Redis In-Memory Store", yoe: "1y", mastery: "mastered", col: 14, row: 3 },
-  { symbol: "My", version: "9.0", name: "MySQL", blurb: "MySQL Relational Database", yoe: "1y", mastery: "mastered", col: 15, row: 3 },
-  { symbol: "Dk", version: "28.0", name: "Docker", blurb: "Docker Container Platform", yoe: "1y", mastery: "mastered", col: 16, row: 3 },
-  { symbol: "Lx", version: "6.14", name: "Linux", blurb: "Linux Operating System", yoe: "1y", mastery: "mastered", col: 17, row: 3 },
-  { symbol: "Ng", version: "1.29", name: "Nginx", blurb: "Nginx Web Server", yoe: "1y", mastery: "mastered", col: 18, row: 3 },
-  { symbol: "Ja", version: "25", name: "Java", blurb: "Java Programming Language", yoe: "1y", mastery: "mastered", col: 1, row: 4 },
-  { symbol: "Sb", version: "4.0", name: "Spring Boot", blurb: "Spring Boot Java Framework", yoe: "1y", mastery: "mastered", col: 2, row: 4 },
-  { symbol: "Mv", version: "3.9", name: "Maven", blurb: "Maven Build Tool", yoe: "1y", mastery: "mastered", col: 4, row: 4 },
-  { symbol: "Qt", version: "6.9", name: "Qt", blurb: "Qt Application Framework", yoe: "1y", mastery: "mastered", col: 5, row: 4 },
-  { symbol: "St", version: "1.49", name: "Streamlit", blurb: "Streamlit Data App Framework", yoe: "1y", mastery: "learning", col: 4, row: 0 },
-  { symbol: "Kb", version: "1.34", name: "Kubernetes", blurb: "Kubernetes Container Orchestration", yoe: "1y", mastery: "learning", col: 5, row: 0 },
-  { symbol: "Pg", version: "17", name: "PostgreSQL", blurb: "PostgreSQL Relational Database", yoe: "1y", mastery: "learning", col: 6, row: 0 },
+  // S block — Python ecosystem, including its learning items.
+  tile({ symbol: "Py", name: "Python", family: "Python", block: "S", row: 1, col: 1, version: "3.14", yoe: "1y" }),
+  tile({ symbol: "Fa", name: "FastAPI", family: "Python", block: "S", row: 2, col: 1, version: "0.121", yoe: "1y" }),
+  tile({ symbol: "Al", name: "SQLAlchemy", family: "Python", block: "S", row: 2, col: 2 }),
+  tile({ symbol: "Uv", name: "uv", family: "Python", block: "S", row: 3, col: 1 }),
+  tile({ symbol: "Pd", name: "Pydantic", family: "Python", block: "S", row: 3, col: 2 }),
+  tile({ symbol: "Lc", name: "LangChain", family: "Python", block: "S", row: 4, col: 1, mastery: "learning" }),
+  tile({ symbol: "Lg", name: "LangGraph", family: "Python", block: "S", row: 4, col: 2, mastery: "learning" }),
+  tile({ symbol: "Ls", name: "LangSmith", family: "Python", block: "S", row: 5, col: 1, mastery: "learning" }),
+  tile({ symbol: "St", name: "Streamlit", family: "Python", block: "S", row: 5, col: 2, version: "1.49", yoe: "1y" }),
+  tile({ symbol: "Sg", name: "Swagger", family: "Python", block: "S", row: 6, col: 1 }),
+
+  // P block — Java ecosystem.
+  tile({ symbol: "Ja", name: "Java", family: "Java", block: "P", row: 1, col: 18, version: "25", yoe: "1y" }),
+  tile({ symbol: "Sb", name: "Spring Boot", family: "Java", block: "P", row: 2, col: 18, version: "4.0", yoe: "1y" }),
+  tile({ symbol: "Gw", name: "Spring API Gateway", family: "Java", block: "P", row: 2, col: 14 }),
+  tile({ symbol: "Ss", name: "Spring Security", family: "Java", block: "P", row: 2, col: 15 }),
+  tile({ symbol: "Eu", name: "Eureka", family: "Java", block: "P", row: 2, col: 16 }),
+  tile({ symbol: "Cf", name: "Config Server", family: "Java", block: "P", row: 2, col: 17 }),
+  tile({ symbol: "Sw", name: "Spring Web", family: "Java", block: "P", row: 3, col: 13 }),
+  tile({ symbol: "Fy", name: "Flyway", family: "Java", block: "P", row: 3, col: 14 }),
+  tile({ symbol: "Hb", name: "Hibernate", family: "Java", block: "P", row: 3, col: 15 }),
+  tile({ symbol: "R4", name: "Resilience4j", family: "Java", block: "P", row: 3, col: 16 }),
+  tile({ symbol: "Lo", name: "Lombok", family: "Java", block: "P", row: 3, col: 17 }),
+  tile({ symbol: "L4", name: "Log4j", family: "Java", block: "P", row: 4, col: 14 }),
+  tile({ symbol: "AI", name: "Spring AI", family: "Java", block: "P", row: 4, col: 15 }),
+  tile({ symbol: "Mv", name: "Maven", family: "Java", block: "P", row: 4, col: 16, version: "3.9", yoe: "1y" }),
+  tile({ symbol: "Ng", name: "Nginx", family: "Performance", block: "P", row: 6, col: 17, version: "1.29", yoe: "1y" }),
+  tile({ symbol: "Kf", name: "Kafka", family: "Performance", block: "P", row: 6, col: 18 }),
+
+  // D block — JavaScript and TypeScript, frontend and backend.
+  tile({ symbol: "Js", name: "JavaScript", family: "Javascript(frontend)", block: "D", row: 4, col: 4, version: "ES25", yoe: "3y" }),
+  tile({ symbol: "Ts", name: "TypeScript", family: "Typescript(backend)", block: "D", row: 4, col: 9, version: "5.9", yoe: "3y" }),
+  tile({ symbol: "Ht", name: "HTML", family: "Javascript(frontend)", block: "D", row: 4, col: 5, version: "5", yoe: "3y" }),
+  tile({ symbol: "Cs", name: "CSS", family: "Javascript(frontend)", block: "D", row: 4, col: 6, version: "3", yoe: "3y" }),
+  tile({ symbol: "Tw", name: "Tailwind CSS", family: "Javascript(frontend)", block: "D", row: 4, col: 7, version: "4.3", yoe: "3y" }),
+  tile({ symbol: "Re", name: "React", family: "Javascript(frontend)", block: "D", row: 5, col: 5, version: "19.3", yoe: "3y" }),
+  tile({ symbol: "Nx", name: "Next.js", family: "Javascript(frontend)", block: "D", row: 5, col: 4, version: "16.3", yoe: "3y" }),
+  tile({ symbol: "Sh", name: "shadcn/ui", family: "Javascript(frontend)", block: "D", row: 6, col: 5 }),
+  tile({ symbol: "Zu", name: "Zustand", family: "Javascript(frontend)", block: "D", row: 5, col: 6 }),
+  tile({ symbol: "No", name: "Node.js", family: "Typescript(backend)", block: "D", row: 4, col: 10, version: "24", yoe: "3y" }),
+  tile({ symbol: "Bu", name: "Bun", family: "Typescript(backend)", block: "D", row: 4, col: 11 }),
+  tile({ symbol: "Ex", name: "Express", family: "Typescript(backend)", block: "D", row: 4, col: 12, version: "5.1", yoe: "3y" }),
+  tile({ symbol: "Ba", name: "Better Auth", family: "Typescript(backend)", block: "D", row: 5, col: 9 }),
+  tile({ symbol: "Zd", name: "Zod", family: "Typescript(backend)", block: "D", row: 5, col: 10 }),
+  tile({ symbol: "By", name: "bcrypt", family: "Typescript(backend)", block: "D", row: 5, col: 11 }),
+  tile({ symbol: "Ck", name: "Clerk", family: "Typescript(backend)", block: "D", row: 5, col: 12 }),
+  tile({ symbol: "Pi", name: "Pino", family: "Typescript(backend)", block: "D", row: 6, col: 9 }),
+  tile({ symbol: "Mu", name: "Multer", family: "Typescript(backend)", block: "D", row: 6, col: 10 }),
+  tile({ symbol: "Pr", name: "Prisma", family: "Typescript(backend)", block: "D", row: 6, col: 11 }),
+  tile({ symbol: "Mg", name: "Mongoose", family: "Typescript(backend)", block: "D", row: 6, col: 12 }),
+  tile({ symbol: "Tq", name: "TanStack Query", family: "Javascript(frontend)", block: "D", row: 5, col: 7 }),
+
+  // F block — DevOps and databases, then cloud platforms and observability.
+  tile({ symbol: "Gt", name: "Git", family: "Devops", block: "F", row: 0, frow: 1, col: 1 }),
+  tile({ symbol: "Dk", name: "Docker", family: "Devops", block: "F", row: 0, frow: 1, col: 2, version: "28.0", yoe: "1y" }),
+  tile({ symbol: "Gh", name: "GitHub Actions", family: "Devops", block: "F", row: 0, frow: 1, col: 4 }),
+  tile({ symbol: "Mo", name: "MongoDB", family: "Database", block: "F", row: 0, frow: 1, col: 8, version: "8.0", yoe: "1y" }),
+  tile({ symbol: "Pv", name: "pgvector", family: "Database", block: "F", row: 0, frow: 1, col: 9 }),
+  tile({ symbol: "Es", name: "Elasticsearch", family: "Database", block: "F", row: 0, frow: 1, col: 10 }),
+  tile({ symbol: "Rd", name: "Redis", family: "Database", block: "F", row: 0, frow: 1, col: 11, version: "8.0", yoe: "1y" }),
+  tile({ symbol: "Sq", name: "SQLite", family: "Database", block: "F", row: 0, frow: 1, col: 12 }),
+  tile({ symbol: "Su", name: "Supabase", family: "Database", block: "F", row: 0, frow: 1, col: 13 }),
+
+  tile({ symbol: "Cy", name: "Cloudinary", family: "Cloud", block: "F", row: 0, frow: 2, col: 1 }),
+  tile({ symbol: "Im", name: "ImageKit", family: "Cloud", block: "F", row: 0, frow: 2, col: 2 }),
+  tile({ symbol: "S3", name: "Amazon S3", family: "Cloud", block: "F", row: 0, frow: 2, col: 3 }),
+  tile({ symbol: "E2", name: "Amazon EC2", family: "Cloud", block: "F", row: 0, frow: 2, col: 4 }),
+  tile({ symbol: "La", name: "AWS Lambda", family: "Cloud", block: "F", row: 0, frow: 2, col: 5 }),
+  tile({ symbol: "Ec", name: "Amazon ECR", family: "Cloud", block: "F", row: 0, frow: 2, col: 6 }),
+  tile({ symbol: "En", name: "Amazon ECS", family: "Cloud", block: "F", row: 0, frow: 2, col: 7 }),
+  tile({ symbol: "Ek", name: "Amazon EKS", family: "Cloud", block: "F", row: 0, frow: 2, col: 8 }),
+  tile({ symbol: "Ot", name: "OpenTelemetry", family: "Monitoring", block: "F", row: 0, frow: 2, col: 10 }),
+  tile({ symbol: "Pm", name: "Prometheus", family: "Monitoring", block: "F", row: 0, frow: 2, col: 11 }),
+  tile({ symbol: "Gr", name: "Grafana", family: "Monitoring", block: "F", row: 0, frow: 2, col: 12 }),
+  tile({ symbol: "Pg", name: "PostgreSQL", family: "Database", block: "F", row: 0, frow: 1, col: 14, version: "17", yoe: "1y" }),
+  tile({ symbol: "Kb", name: "Kubernetes", family: "Devops", block: "F", row: 0, frow: 1, col: 3, version: "1.34", yoe: "1y" }),
 ];
 
 export interface ContactLink {
