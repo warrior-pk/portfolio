@@ -15,11 +15,12 @@ import {
 import { useMotionGate } from "@/lib/motion-gate";
 import { useGlowColor } from "@/lib/glow";
 import { GlobalSpotlight, ParticleCard } from "./MagicBento";
+import { SkillMark } from "./SkillMark";
 
 /**
  * ElementTable: the Skills chemistry table. A full seven-period,
  * eighteen-column frame with explicit empty cells, plus a detached
- * two-row f-block for learning elements and reserved future slots.
+ * two-row f-block for DevOps, data, cloud, and observability skills.
  * Families sit grouped by position with no names or labels. Each tile
  * is a MagicBento card with spotlight plus border glow only; without
  * the pointer-FX gate the same content renders as static tiles. The
@@ -33,8 +34,8 @@ export function ElementTable() {
   const main = new Map(
     PERIODIC_TILES.filter((t) => t.row !== 0).map((t) => [`${t.row}:${t.col}`, t]),
   );
-  const frow = new Map(
-    PERIODIC_TILES.filter((t) => t.row === 0).map((t) => [t.col, t]),
+  const fblock = new Map(
+    PERIODIC_TILES.filter((t) => t.row === 0).map((t) => [`${t.frow}:${t.col}`, t]),
   );
   const future = new Set(FUTURE_SLOTS.map((s) => `${s.f}:${s.col}`));
 
@@ -59,7 +60,7 @@ export function ElementTable() {
           glowColor={glow}
         />
       )}
-      <ul aria-label="elements" className="element-grid mt-8">
+      <ul aria-label="elements" className="element-grid">
         {periods.flatMap((row) =>
           cols.flatMap((col) => {
             if (isTableVoid(row, col)) return [];
@@ -90,9 +91,13 @@ export function ElementTable() {
       </ul>
       <div className="element-fblock">
         {frows.map((f) => (
-          <ul key={f} aria-label={f === 1 ? "learning elements" : "future elements"} className="element-grid">
+          <ul
+            key={f}
+            aria-label={f === 1 ? "DevOps and databases" : "cloud services and observability"}
+            className="element-grid element-frow-grid"
+          >
             {fcols.map((col) => {
-              const actual = f === 1 ? frow.get(col) : undefined;
+              const actual = fblock.get(`${f}:${col}`);
               if (actual) {
                 return (
                   <ElementCell
@@ -153,18 +158,20 @@ function ElementCell({
   } as React.CSSProperties;
   const face = (
     <>
-      <span className="element-version">{tile.version}</span>
-      <span className="element-symbol">{tile.symbol}</span>
-      <span className="element-name">{tile.name}</span>
+      <SkillMark name={tile.name} symbol={tile.symbol} />
     </>
   );
   const card = (
     <div className="tile-card" aria-hidden="true">
       <p className="tile-card-title">{tile.name}</p>
-      <p className="tile-card-sub">{tile.blurb}</p>
-      <p className="tile-card-meta">
-        v{tile.version} · {tile.yoe} exp
-      </p>
+      <p className="tile-card-sub">{tile.blurb ?? tile.name}</p>
+      {tile.version || tile.yoe ? (
+        <p className="tile-card-meta">
+          {[tile.version ? `v${tile.version}` : null, tile.yoe ? `${tile.yoe} exp` : null]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      ) : null}
       <button type="button" disabled className="tile-card-proj">
         Projects →
       </button>
@@ -175,6 +182,8 @@ function ElementCell({
     return (
       <li
         data-cell
+        data-block={tile.block}
+        data-skill={tile.name}
         data-mastery={tile.mastery}
         data-flip={below || undefined}
         data-edge-l={tile.col <= 2 || undefined}
@@ -183,7 +192,7 @@ function ElementCell({
         tabIndex={0}
         aria-label={describeTile(tile)}
       >
-        <div className="element-tile">{face}</div>
+        <div className="element-tile element-tile--mark-only">{face}</div>
         {card}
       </li>
     );
@@ -192,6 +201,8 @@ function ElementCell({
   return (
     <li
       data-cell
+      data-block={tile.block}
+      data-skill={tile.name}
       data-mastery={tile.mastery}
       data-flip={below || undefined}
       data-edge-l={tile.col <= 2 || undefined}
@@ -201,7 +212,7 @@ function ElementCell({
       aria-label={describeTile(tile)}
     >
       <ParticleCard
-        className="card card--border-glow element-tile"
+        className="card card--border-glow element-tile element-tile--mark-only"
         disableAnimations={false}
         particleCount={0}
         glowColor={glow}

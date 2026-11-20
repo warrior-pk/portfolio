@@ -130,18 +130,9 @@ main > header nav a:focus-visible::after {
 }
 
 #about-heading {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  display: block;
   font-size: clamp(2.6rem, 4.2vw, 4rem);
   font-weight: 500;
-}
-
-#about-heading::after {
-  content: "";
-  height: 1px;
-  flex: 1;
-  background: linear-gradient(to right, var(--color-hairline), transparent);
 }
 
 #about > div:nth-of-type(2) p {
@@ -152,9 +143,8 @@ main > header nav a:focus-visible::after {
 }
 
 #about > div:nth-of-type(3) p {
-  padding-top: 0.35rem;
-  border-top: 1px solid var(--color-hairline);
-  line-height: 1.85;
+  max-width: 34ch;
+  line-height: 1.75;
 }
 
 #skills-heading {
@@ -241,9 +231,10 @@ main > header nav a:focus-visible::after {
 @media (min-width: 900px) {
   #about {
     display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.7fr);
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+    grid-template-rows: auto auto auto;
     column-gap: clamp(3rem, 7vw, 7rem);
+    row-gap: clamp(2rem, 4vh, 3rem);
     align-content: center;
   }
 
@@ -254,18 +245,18 @@ main > header nav a:focus-visible::after {
   #about > div:nth-of-type(2) {
     grid-column: 1;
     grid-row: 2 / 4;
-    align-self: center;
+    align-self: start;
   }
 
   #about > div:nth-of-type(3) {
     grid-column: 2;
     grid-row: 2;
-    align-self: end;
+    align-self: start;
   }
 
   #about > div:nth-of-type(4) {
     grid-column: 2;
-    grid-row: 3 / 5;
+    grid-row: 3;
     align-self: start;
   }
 
@@ -331,5 +322,149 @@ main > header nav a:focus-visible::after {
 
   main > header nav a > span {
     margin-right: 2px;
+  }
+}
+
+/* Responsive art direction: preserve the large, typographic hero while
+   giving the ambient object its own lane and keeping the pinned seam clear. */
+#god-particle {
+  top: 6%;
+  right: 7%;
+  left: auto;
+  width: min(46vmin, 34rem);
+  height: min(46vmin, 34rem);
+  transform: none;
+  translate: 0;
+  opacity: 0.78;
+}
+
+@media (max-width: 768px) {
+  #hero-heading {
+    font-size: clamp(4.25rem, min(16vw, 26svh), 8rem);
+    letter-spacing: -0.06em;
+  }
+
+  #god-particle {
+    top: 5%;
+    right: 2%;
+    width: min(44vmin, 20rem);
+    height: min(44vmin, 20rem);
+    opacity: 0.62;
+  }
+
+  #about,
+  #skills,
+  #projects,
+  #contact {
+    padding-inline: clamp(1.25rem, 5vw, 2.5rem);
+  }
+
+  .element-grid {
+    gap: 0.45rem;
+  }
+
+  .element-tile {
+    padding: 0.4rem;
+  }
+}
+
+/* Keep full technology names readable as the 18-column table runs out of
+   physical width. The ordered list stays intact while its visual grid
+   progressively packs into wider, more legible cells. */
+@media (min-width: 769px) and (max-width: 1200px) {
+  .element-grid {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+
+  .element-grid [data-cell] {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .element-gap {
+    display: none;
+  }
+
+  .element-fblock {
+    padding-left: 0;
+  }
+
+  .element-frow-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 600px) {
+  .element-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 600px) {
+  section[id],
+  [data-stage] {
+    scroll-margin-top: 88px;
+  }
+
+  main > header > div {
+    gap: 0.25rem;
+    padding-block: 0.375rem;
+  }
+
+  main > header p {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+
+  main > header nav {
+    gap: 0;
+    line-height: 1;
+  }
+
+  #hero > div:last-child {
+    padding-inline: 1.25rem;
+  }
+
+  #hero-heading {
+    font-size: clamp(3.35rem, 17vw, 4.25rem);
+    letter-spacing: -0.065em;
+  }
+
+  #god-particle {
+    top: 7%;
+    right: -8%;
+    width: min(52vw, 13rem);
+    height: min(52vw, 13rem);
+    opacity: 0.54;
+  }
+
+  #about > div:nth-of-type(2) p {
+    max-width: 20ch;
+    font-size: clamp(1.75rem, 7vw, 2.15rem);
+    line-height: 1.16;
+  }
+
+  #projects > ul {
+    gap: 0.5rem;
+    padding: 0;
+    background: transparent;
+    border: 0;
+  }
+
+  #projects > ul [data-scrub-step] {
+    padding: 1.125rem;
+  }
+
+  #contact li a {
+    min-height: 3.5rem;
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #god-particle {
+    opacity: 0.42;
   }
 }

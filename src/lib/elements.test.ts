@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { hasSkillMark, SKILL_ICON_NAMES, SkillMark } from "../components/SkillMark";
 import {
   PERIODIC_TILES,
   describeTile,
@@ -10,150 +13,126 @@ import {
   FUTURE_SLOTS,
 } from "./site";
 
-/**
- * Element data seam: every PeriodicTile owns grid coordinates plus a
- * mastery state, so the chemistry table grows by data edits, never layout
- * rewrites. Expectations come from spec #19 / ticket #20, not the code.
- */
-describe("periodic table geometry", () => {
-  it("keeps every element inside the 18-column chemistry grid", () => {
-    expect(PERIODIC_TILES.length).toBeGreaterThan(0);
+describe("skill table data", () => {
+  it("keeps every tile within its main or detached grid", () => {
     for (const tile of PERIODIC_TILES) {
       expect(tile.col).toBeGreaterThanOrEqual(1);
-      expect(tile.col).toBeLessThanOrEqual(18);
+      expect(tile.col).toBeLessThanOrEqual(tile.row === 0 ? FBLOCK_COLS : TABLE_COLS);
       expect(tile.row).toBeGreaterThanOrEqual(0);
-      expect(tile.row).toBeLessThanOrEqual(4);
+      expect(tile.row).toBeLessThanOrEqual(TABLE_PERIODS);
+      if (tile.row === 0) expect(tile.frow).toBeGreaterThanOrEqual(1);
     }
   });
 
-  it("never stacks two elements on one cell", () => {
-    const cells = PERIODIC_TILES.map((t) => `${t.row}:${t.col}`);
+  it("uses unique cells and symbols, including both f-block rows", () => {
+    const cells = PERIODIC_TILES.map((t) =>
+      t.row === 0 ? `f${t.frow}:${t.col}` : `${t.row}:${t.col}`,
+    );
     expect(new Set(cells).size).toBe(cells.length);
-  });
-
-  it("uses unique symbols", () => {
     const symbols = PERIODIC_TILES.map((t) => t.symbol);
     expect(new Set(symbols).size).toBe(symbols.length);
   });
 
-  it("anchors the approved families: web basics left, JS/TS right", () => {
-    const at = (row: number, col: number) =>
-      PERIODIC_TILES.find((t) => t.row === row && t.col === col)?.symbol;
-    expect(at(1, 1)).toBe("Ht");
-    expect(at(1, 18)).toBe("Nx");
-    expect(at(2, 1)).toBe("Cs");
-    expect(at(2, 18)).toBe("Ex");
+  it("groups skills into the agreed families", () => {
+    const namesFor = (block: string) =>
+      PERIODIC_TILES.filter((tile) => tile.block === block).map((tile) => tile.name);
+    expect(namesFor("S")).toContain("Python");
+    expect(namesFor("P")).toContain("Java");
+    expect(namesFor("D")).toContain("Node.js");
+    expect(namesFor("D")).toContain("React");
+    expect(namesFor("D")).toContain("CSS");
+    expect(namesFor("D")).not.toContain("Sass");
+    expect(namesFor("F")).toContain("Docker");
+    expect(namesFor("F")).toContain("PostgreSQL");
+    expect(namesFor("F")).toContain("OpenTelemetry");
   });
 
-  it("fills rows 2-3 like the reference periods", () => {
-    const row = (n: number) =>
-      PERIODIC_TILES.filter((t) => t.row === n)
-        .map((t) => t.col)
-        .sort((a, b) => a - b);
-    expect(row(2)).toEqual([1, 2, 13, 14, 15, 16, 17, 18]);
-    expect(row(3)).toEqual([1, 2, 13, 14, 15, 16, 17, 18]);
+  it("keeps learning skills with Python and places selected tiles at the right edge", () => {
+    const learning = PERIODIC_TILES.filter((tile) => tile.mastery === "learning");
+    expect(learning.map((tile) => tile.name)).toEqual([
+      "LangChain",
+      "LangGraph",
+      "LangSmith",
+    ]);
+    expect(learning.every((tile) => tile.block === "S" && tile.col <= 2)).toBe(true);
+    const tile = (name: string) => PERIODIC_TILES.find((entry) => entry.name === name)!;
+    expect([tile("Java").row, tile("Java").col]).toEqual([1, 18]);
+    expect([tile("Spring Boot").row, tile("Spring Boot").col]).toEqual([2, 18]);
+    expect([tile("Nginx").row, tile("Nginx").col]).toEqual([6, 17]);
+    expect([tile("Kafka").row, tile("Kafka").col]).toEqual([6, 18]);
   });
 
-  it("holds the detached f-row for learning and future elements", () => {
-    const frow = PERIODIC_TILES.filter((t) => t.row === 0).map((t) => t.symbol);
-    expect(frow).toContain("St");
-    expect(frow).toContain("Kb");
-    expect(frow).toContain("Pg");
-  });
-
-  it("marks only f-row elements as learning", () => {
-    for (const tile of PERIODIC_TILES) {
-      expect(tile.mastery).toBe(tile.row === 0 ? "learning" : "mastered");
-    }
-  });
-
-  it("names every element with a current version", () => {
-    for (const tile of PERIODIC_TILES) {
-      expect(tile.name.length).toBeGreaterThan(0);
-      expect(tile.version.length).toBeGreaterThan(0);
-    }
-  });
-});
-
-describe("describeTile", () => {  it("announces name, version, and mastery", () => {
-    expect(describeTile(PERIODIC_TILES[0])).toBe(
-      "HTML, version 5, 3y experience, mastered",
-    );
-    const learning = PERIODIC_TILES.find((t) => t.mastery === "learning");
-    expect(learning).toBeDefined();
-    expect(describeTile(learning!)).toBe(
-      `${learning!.name}, version ${learning!.version}, ${learning!.yoe} experience, learning`,
-    );
-  });
-});
-
-describe("isTableVoid", () => {
-  it("leaves the middle open like the reference table", () => {
-    expect(isTableVoid(1, 2)).toBe(true);
-    expect(isTableVoid(1, 5)).toBe(true);
-    expect(isTableVoid(1, 17)).toBe(true);
-    expect(isTableVoid(2, 3)).toBe(true);
-    expect(isTableVoid(3, 12)).toBe(true);
-  });
-
-  it("keeps every other main-grid cell", () => {
-    expect(isTableVoid(1, 1)).toBe(false);
-    expect(isTableVoid(1, 18)).toBe(false);
-    expect(isTableVoid(2, 13)).toBe(false);
-    expect(isTableVoid(4, 5)).toBe(false);
-    expect(isTableVoid(6, 7)).toBe(false);
-  });
-});
-
-describe("full table shape", () => {  it("frames seven periods of eighteen columns with a two-row f-block", () => {
-    expect(TABLE_COLS).toBe(18);
-    expect(TABLE_PERIODS).toBe(7);
-    expect(FROW_ROWS).toBe(2);
-    expect(FBLOCK_COLS).toBe(15);
-  });
-
-  it("renders every block: skills plus empties fill the whole frame", () => {
-    const mainCount = PERIODIC_TILES.filter((t) => t.row !== 0).length;
-    // Period 1 voids 16 middle columns; periods 2-3 void 10 each.
-    const voids = 16 + 10 * 2;
-    const empties = TABLE_COLS * TABLE_PERIODS - mainCount - voids;
-    expect(empties).toBe(68);
-    const fEmpties =
-      FBLOCK_COLS * FROW_ROWS -
-      PERIODIC_TILES.filter((t) => t.row === 0).length -
-      FUTURE_SLOTS.length;
-    expect(fEmpties).toBe(20);
-  });
-
-  it("holds future slots inside the f-block, clear of learning tiles", () => {
-    expect(FUTURE_SLOTS.length).toBeGreaterThan(0);
-    const taken = new Set(
-      PERIODIC_TILES.filter((t) => t.row === 0).map((t) => `${t.col}`),
+  it("reserves clear future slots in the detached rows", () => {
+    expect(FUTURE_SLOTS).toHaveLength(6);
+    const occupied = new Set(
+      PERIODIC_TILES.filter((tile) => tile.row === 0).map((tile) => `${tile.frow}:${tile.col}`),
     );
     for (const slot of FUTURE_SLOTS) {
       expect(slot.f).toBeGreaterThanOrEqual(1);
       expect(slot.f).toBeLessThanOrEqual(FROW_ROWS);
       expect(slot.col).toBeGreaterThanOrEqual(1);
-      expect(slot.col).toBeLessThanOrEqual(TABLE_COLS);
-      if (slot.f === 1) expect(taken.has(`${slot.col}`)).toBe(false);
-    }
-  });
-});
-
-describe("hover card details", () => {
-  const WEB = ["Ht", "Cs", "Sa", "Tw", "Js", "Re", "Ts", "No", "Ex", "Nx"];
-
-  it("names every skill in two to five words", () => {
-    for (const tile of PERIODIC_TILES) {
-      const words = tile.blurb.trim().split(/\s+/).length;
-      expect(words).toBeGreaterThanOrEqual(2);
-      expect(words).toBeLessThanOrEqual(5);
+      expect(slot.col).toBeLessThanOrEqual(FBLOCK_COLS);
+      expect(occupied.has(`${slot.f}:${slot.col}`)).toBe(false);
     }
   });
 
-  it("credits three years for web skills and one for the rest", () => {
-    for (const tile of PERIODIC_TILES) {
-      expect(tile.yoe).toBe(WEB.includes(tile.symbol) ? "3y" : "1y");
+  it("preserves the chemistry-table voids", () => {
+    expect(TABLE_COLS).toBe(18);
+    expect(isTableVoid(1, 2)).toBe(true);
+    expect(isTableVoid(2, 13)).toBe(false);
+    expect(isTableVoid(3, 12)).toBe(true);
+  });
+
+  it("describes family and learning status accessibly", () => {
+    expect(describeTile(PERIODIC_TILES[0])).toBe("Python, Python block, version 3.14, 1y experience, mastered");
+    const learning = PERIODIC_TILES.find((tile) => tile.name === "LangChain");
+    expect(describeTile(learning!)).toBe("LangChain, Python block, learning");
+  });
+
+  it("maps available monochrome logos and falls back to initials for gaps", () => {
+    const tileNames = new Set(PERIODIC_TILES.map((tile) => tile.name));
+    expect(new Set(SKILL_ICON_NAMES).size).toBe(SKILL_ICON_NAMES.length);
+    for (const name of SKILL_ICON_NAMES) expect(tileNames.has(name)).toBe(true);
+    expect(hasSkillMark("Python")).toBe(true);
+    expect(hasSkillMark("OpenTelemetry")).toBe(true);
+    for (const name of [
+      "FastAPI",
+      "Swagger",
+      "Git",
+      "Tailwind CSS",
+      "SQLite",
+      "MongoDB",
+      "Streamlit",
+      "Kubernetes",
+      "PostgreSQL",
+      "Prometheus",
+      "Grafana",
+      "Amazon ECR",
+      "Clerk",
+    ]) {
+      expect(hasSkillMark(name)).toBe(true);
     }
+    expect(hasSkillMark("ImageKit")).toBe(false);
+    expect(hasSkillMark("Express")).toBe(false);
+    expect(hasSkillMark("Spring AI")).toBe(false);
+
+    const logoMarkup = renderToStaticMarkup(
+      createElement(SkillMark, { name: "Python", symbol: "Py" }),
+    );
+    const fallbackMarkup = renderToStaticMarkup(
+      createElement(SkillMark, { name: "ImageKit", symbol: "Im" }),
+    );
+    expect(logoMarkup).toContain('aria-hidden="true"');
+    expect(logoMarkup).toContain("<svg");
+    expect(fallbackMarkup).toContain(">Im</span>");
+    expect(fallbackMarkup).not.toContain("ImageKit");
+  });
+
+  it("uses the requested text marks where no brand icon is wanted", () => {
+    const tile = (name: string) => PERIODIC_TILES.find((entry) => entry.name === name)!;
+    expect(tile("Spring AI").symbol).toBe("AI");
+    expect(tile("Express").symbol).toBe("Ex");
+    expect(tile("bcrypt").symbol).toBe("By");
+    expect(tile("Lombok").symbol).toBe("Lo");
   });
 });

@@ -68,6 +68,14 @@ body {
   border-radius: 2px;
 }
 
+:root {
+  --skill-node: #339933;
+  --skill-spring-boot: #6db33f;
+  --skill-fastapi: #009688;
+  --skill-react: #61dafb;
+  --skill-kafka: #e76f00;
+}
+
 /* Mechanical tick for the status-bar timestamp: discrete steps, no sweep */
 @keyframes tick-blink {
   0%,
@@ -247,6 +255,10 @@ html[data-cursor="custom"] *::after {
   padding: 0;
 }
 
+.element-frow-grid {
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+}
+
 .element-grid [data-cell] {
   grid-column: var(--ecol);
   grid-row: var(--erow);
@@ -283,12 +295,9 @@ html[data-cursor="custom"] *::after {
   border-radius: 6px;
 }
 
-.element-version {
-  align-self: flex-end;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  line-height: 1;
-  color: var(--color-faint);
+.element-tile--mark-only {
+  justify-content: center;
+  align-items: center;
 }
 
 .element-symbol {
@@ -299,14 +308,54 @@ html[data-cursor="custom"] *::after {
   color: var(--color-lume);
 }
 
-.element-name {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  line-height: 1.2;
-  color: var(--color-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.element-icon {
+  display: block;
+  flex: 0 0 auto;
+  width: clamp(1.45rem, 1rem + 2vw, 2.35rem);
+  height: clamp(1.45rem, 1rem + 2vw, 2.35rem);
+  max-width: 72%;
+  color: var(--color-lume);
+}
+
+.element-icon--small {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.element-grid [data-skill="Node.js"] {
+  --skill-accent: var(--skill-node);
+}
+
+.element-grid [data-skill="Spring Boot"] {
+  --skill-accent: var(--skill-spring-boot);
+}
+
+.element-grid [data-skill="FastAPI"] {
+  --skill-accent: var(--skill-fastapi);
+}
+
+.element-grid [data-skill="React"] {
+  --skill-accent: var(--skill-react);
+}
+
+.element-grid [data-skill="Kafka"] {
+  --skill-accent: var(--skill-kafka);
+}
+
+.element-grid :is(
+    [data-skill="Node.js"],
+    [data-skill="Spring Boot"],
+    [data-skill="FastAPI"],
+    [data-skill="React"],
+    [data-skill="Kafka"]
+  ) .element-tile {
+  border-color: color-mix(in srgb, var(--skill-accent) 58%, var(--color-hairline));
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--skill-accent) 13%, var(--color-panel)),
+    var(--color-panel)
+  );
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--skill-accent) 7%, transparent);
 }
 
 /* Hover detail card: anchored to the tile, opens on hover and keyboard

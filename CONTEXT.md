@@ -9,7 +9,7 @@ One of the five numbered full-screen sections on the route: hero, about, skills,
 _Avoid_: page, tab, screen
 
 **PeriodicTile**:
-A tech skill rendered as a periodic-table cell: big symbol, name, and version at top-right. Full opacity means mastered, faded with a dashed border means still learning, and blank gap cells hold the chemistry-table geometry.
+A tech skill rendered as a periodic-table cell with a centered monochrome logo or short text mark. No skill name or version appears on the tile face; the accessible label and hover details retain the full name. Each skill has a family field and a separate S/P/D/F table block. Family positions cluster related skills, learning state stays with the skill's family, and the detached f-block holds DevOps, database, cloud, and monitoring skills. Selected skills use a subtle colored tile accent while their marks stay monochrome.
 _Avoid_: skill badge, tech card, pill
 
 **Vault**:
